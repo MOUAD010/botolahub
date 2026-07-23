@@ -1,0 +1,182 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "botolaPro": "البطولة الاحترافية",
+    "standings": "الترتيب",
+    "fixtures": "المباريات",
+    "topScorers": "الهدافون",
+    "results": "النتائج",
+    "blogs": "المدونة",
+    "menu": "القائمة"
+  },
+  "common": {
+    "live": "مباشر",
+    "finished": "انتهت",
+    "upcoming": "قادمة",
+    "all": "الكل",
+    "today": "اليوم",
+    "venue": "الملعب",
+    "matchday": "الجولة",
+    "loading": "جارٍ التحميل...",
+    "toggleTheme": "تبديل الوضع الفاتح / الداكن",
+    "light": "فاتح",
+    "dark": "داكن",
+    "system": "النظام",
+    "language": "اللغة",
+    "goals": "الأهداف",
+    "vs": "ضد"
+  },
+  "home": {
+    "title": "KooraLive — نتائج مباشرة للبطولة الاحترافية المغربية",
+    "description": "تابع النتائج المباشرة والترتيب ونتائج البطولة الاحترافية المغربية.",
+    "fixturesHeading": "مباريات اليوم",
+    "standingsHeading": "الترتيب",
+    "viewFullStandings": "الترتيب الكامل",
+    "noMatches": "لا توجد مباريات في هذه الفئة.",
+    "teamOfTheWeek": "تشكيلة الأسبوع"
+  },
+  "match": {
+    "overview": "نظرة عامة",
+    "lineups": "التشكيلة",
+    "playerStats": "إحصائيات اللاعبين",
+    "stats": "الإحصائيات",
+    "standings": "الترتيب",
+    "h2h": "المواجهات المباشرة",
+    "media": "الوسائط",
+    "startingXI": "التشكيلة الأساسية",
+    "substitutes": "البدلاء",
+    "possession": "الاستحواذ",
+    "shots": "التسديدات",
+    "shotsOnTarget": "التسديدات على المرمى",
+    "corners": "الركنيات",
+    "fouls": "الأخطاء",
+    "yellowCards": "البطاقات الصفراء",
+    "redCards": "البطاقات الحمراء",
+    "noPreviousMeetings": "لا توجد مواجهات سابقة متاحة.",
+    "leaguePosition": "المركز في الترتيب",
+    "noLineups": "التشكيلة غير متوفرة بعد.",
+    "noStats": "الإحصائيات غير متوفرة بعد.",
+    "noMedia": "أبرز اللحظات قريباً."
+  },
+  "standings": {
+    "position": "#",
+    "team": "الفريق",
+    "played": "لعب",
+    "won": "فاز",
+    "drawn": "تعادل",
+    "lost": "خسر",
+    "goalsFor": "له",
+    "goalsAgainst": "عليه",
+    "goalDifference": "الفرق",
+    "points": "النقاط",
+    "form": "الشكل",
+    "legendTitle": "المفتاح",
+    "continental": "المسابقات القارية",
+    "relegation": "منطقة الهبوط"
+  },
+  "team": {
+    "squad": "التشكيلة",
+    "recentForm": "الأداء الأخير",
+    "upcomingFixtures": "المباريات القادمة",
+    "leaguePosition": "المركز في الترتيب",
+    "tabMatches": "المباريات",
+    "tabStats": "الإحصائيات",
+    "tabStandings": "الترتيب",
+    "latestMatches": "آخر المباريات",
+    "trophies": "الألقاب",
+    "noTrophies": "لا توجد ألقاب مسجلة بعد.",
+    "seasons": "ألقاب حديثة"
+  },
+  "player": {
+    "profile": "اللاعب",
+    "seasonStats": "إحصائيات الموسم",
+    "recentRatings": "التقييمات الأخيرة",
+    "rating": "التقييم",
+    "assists": "التمريرات الحاسمة",
+    "appearances": "المباريات الملعوبة",
+    "minutes": "د",
+    "matchesTab": "المباريات",
+    "seasonTab": "الموسم",
+    "careerTab": "المسيرة",
+    "summaryLastMonths": "ملخص (المباريات الأخيرة)",
+    "nationality": "الجنسية",
+    "age": "العمر",
+    "years": "سنة",
+    "position": "المركز",
+    "height": "الطول",
+    "preferredFoot": "القدم المفضلة",
+    "shirtNumber": "رقم القميص",
+    "foot": {
+      "left": "يسار",
+      "right": "يمين",
+      "both": "كلاهما"
+    },
+    "positions": {
+      "GK": "حارس مرمى",
+      "DF": "مدافع",
+      "MF": "وسط",
+      "FW": "مهاجم"
+    }
+  },
+  "blogs": {
+    "title": "المدونة — KooraLive",
+    "heading": "المدونة",
+    "description": "معاينات وملخصات وقصص من البطولة الاحترافية.",
+    "disclaimer": "محتوى تحريري للجماهير — مستقل عن الجامعة الملكية المغربية لكرة القدم."
+  },
+  "competition": {
+    "metaTitle": "البطولة الاحترافية — الترتيب والمباريات والإحصائيات",
+    "metaDescription": "ترتيب مباشر ومباريات وإحصائيات اللاعبين وتفاصيل البطولة الاحترافية المغربية.",
+    "name": "البطولة الاحترافية",
+    "country": "المغرب",
+    "season": "2025/26",
+    "seasonStart": "أغسطس 2025",
+    "seasonEnd": "مايو 2026",
+    "favourite": "المفضلة",
+    "followers": "الدوري المغربي الأول",
+    "matches": "المباريات",
+    "byRound": "حسب الجولة",
+    "byDate": "حسب التاريخ",
+    "featured": "مباراة مميزة",
+    "tabStandings": "الترتيب",
+    "tabStats": "الإحصائيات",
+    "tabDetails": "التفاصيل",
+    "tabMedia": "الوسائط",
+    "filterAll": "الكل",
+    "filterHome": "محلي",
+    "filterAway": "خارجي",
+    "playerStats": "إحصائيات اللاعبين",
+    "statGeneral": "عام",
+    "statAttack": "هجوم",
+    "statDefense": "دفاع",
+    "statPassing": "تمرير",
+    "statGoalkeeping": "حراسة",
+    "noMedia": "الوسائط قريباً.",
+    "detailsBody": "البطولة الاحترافية هي الدوري المغربي الأول وتضم 16 نادياً يتنافسون على اللقب والتأهل القاري.",
+    "countryLabel": "البلد",
+    "seasonLabel": "الموسم",
+    "teamsLabel": "الأندية"
+  },
+  "ads": {
+    "advertisement": "إعلان"
+  },
+  "footer": {
+    "rights": "جميع الحقوق محفوظة.",
+    "disclaimer": "KooraLive غير تابع للجامعة الملكية المغربية لكرة القدم."
+  },
+  "search": {
+    "label": "بحث",
+    "placeholder": "ابحث عن مباريات، فرق، لاعبين…",
+    "empty": "لا توجد نتائج.",
+    "clear": "مسح البحث",
+    "kinds": {
+      "team": "فريق",
+      "player": "لاعب",
+      "match": "مباراة"
+    }
+  },
+  "ticker": {
+    "label": "مباريات هذا الأسبوع",
+    "thisWeek": "هذا الأسبوع"
+  }
+}

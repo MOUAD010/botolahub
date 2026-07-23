@@ -1,0 +1,182 @@
+{
+  "nav": {
+    "home": "Home",
+    "botolaPro": "Botola Pro",
+    "standings": "Standings",
+    "fixtures": "Fixtures",
+    "topScorers": "Top Scorers",
+    "results": "Results",
+    "blogs": "Blog",
+    "menu": "Menu"
+  },
+  "common": {
+    "live": "Live",
+    "finished": "Finished",
+    "upcoming": "Upcoming",
+    "all": "All",
+    "today": "Today",
+    "venue": "Venue",
+    "matchday": "Matchday",
+    "loading": "Loading...",
+    "toggleTheme": "Toggle light / dark mode",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "language": "Language",
+    "goals": "Goals",
+    "vs": "vs"
+  },
+  "home": {
+    "title": "KooraLive — Live Botola Pro Football Scores",
+    "description": "Follow live scores, standings, and results for the Moroccan Botola Pro.",
+    "fixturesHeading": "Today's Fixtures",
+    "standingsHeading": "Standings",
+    "viewFullStandings": "Full standings",
+    "noMatches": "No matches in this category.",
+    "teamOfTheWeek": "Team of the Week"
+  },
+  "match": {
+    "overview": "Overview",
+    "lineups": "Lineups",
+    "playerStats": "Player stats",
+    "stats": "Statistics",
+    "standings": "Standings",
+    "h2h": "H2H",
+    "media": "Media",
+    "startingXI": "Starting XI",
+    "substitutes": "Substitutes",
+    "possession": "Possession",
+    "shots": "Shots",
+    "shotsOnTarget": "Shots on Target",
+    "corners": "Corners",
+    "fouls": "Fouls",
+    "yellowCards": "Yellow Cards",
+    "redCards": "Red Cards",
+    "noPreviousMeetings": "No previous meetings available.",
+    "leaguePosition": "League Position",
+    "noLineups": "Lineups not available yet.",
+    "noStats": "Stats not available yet.",
+    "noMedia": "Highlights coming soon."
+  },
+  "standings": {
+    "position": "#",
+    "team": "Team",
+    "played": "P",
+    "won": "W",
+    "drawn": "D",
+    "lost": "L",
+    "goalsFor": "GF",
+    "goalsAgainst": "GA",
+    "goalDifference": "GD",
+    "points": "Pts",
+    "form": "Form",
+    "legendTitle": "Legend",
+    "continental": "Continental competitions",
+    "relegation": "Relegation zone"
+  },
+  "team": {
+    "squad": "Squad",
+    "recentForm": "Recent form",
+    "upcomingFixtures": "Upcoming fixtures",
+    "leaguePosition": "League position",
+    "tabMatches": "Matches",
+    "tabStats": "Statistics",
+    "tabStandings": "Standings",
+    "latestMatches": "Latest matches",
+    "trophies": "Trophies",
+    "noTrophies": "No trophies recorded yet.",
+    "seasons": "Recent titles"
+  },
+  "player": {
+    "profile": "Player",
+    "seasonStats": "Season Stats",
+    "recentRatings": "Recent Ratings",
+    "rating": "Rating",
+    "assists": "Assists",
+    "appearances": "Appearances",
+    "minutes": "Min",
+    "matchesTab": "Matches",
+    "seasonTab": "Season",
+    "careerTab": "Career",
+    "summaryLastMonths": "Summary (recent matches)",
+    "nationality": "Nationality",
+    "age": "Age",
+    "years": "yrs",
+    "position": "Position",
+    "height": "Height",
+    "preferredFoot": "Preferred foot",
+    "shirtNumber": "Shirt number",
+    "foot": {
+      "left": "Left",
+      "right": "Right",
+      "both": "Both"
+    },
+    "positions": {
+      "GK": "Goalkeeper",
+      "DF": "Defender",
+      "MF": "Midfielder",
+      "FW": "Forward"
+    }
+  },
+  "blogs": {
+    "title": "Blog — KooraLive",
+    "heading": "Blog",
+    "description": "Previews, roundups, and stories from Botola Pro.",
+    "disclaimer": "Editorial content for fans — independent of the FRMF."
+  },
+  "competition": {
+    "metaTitle": "Botola Pro — Standings, fixtures & stats",
+    "metaDescription": "Botola Pro live standings, matchday fixtures, player stats and season details.",
+    "name": "Botola Pro",
+    "country": "Morocco",
+    "season": "2025/26",
+    "seasonStart": "Aug 2025",
+    "seasonEnd": "May 2026",
+    "favourite": "Favourite",
+    "followers": "Morocco’s top division",
+    "matches": "Matches",
+    "byRound": "By round",
+    "byDate": "By date",
+    "featured": "Featured",
+    "tabStandings": "Standings",
+    "tabStats": "Stats",
+    "tabDetails": "Details",
+    "tabMedia": "Media",
+    "filterAll": "All",
+    "filterHome": "Home",
+    "filterAway": "Away",
+    "playerStats": "Player stats",
+    "statGeneral": "General",
+    "statAttack": "Attack",
+    "statDefense": "Defense",
+    "statPassing": "Passing",
+    "statGoalkeeping": "Goalkeeping",
+    "noMedia": "Media coming soon.",
+    "detailsBody": "Botola Pro is Morocco’s premier football league featuring 16 clubs competing for the national title and continental qualification.",
+    "countryLabel": "Country",
+    "seasonLabel": "Season",
+    "teamsLabel": "Teams"
+  },
+  "ads": {
+    "advertisement": "Advertisement"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "disclaimer": "KooraLive is not affiliated with the FRMF."
+  },
+  "search": {
+    "label": "Search",
+    "placeholder": "Search matches, teams, players…",
+    "empty": "No results found.",
+    "clear": "Clear search",
+    "kinds": {
+      "team": "Team",
+      "player": "Player",
+      "match": "Match"
+    }
+  },
+  "ticker": {
+    "label": "This week’s matches",
+    "thisWeek": "This week"
+  }
+}

@@ -1,0 +1,182 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "botolaPro": "Botola Pro",
+    "standings": "Classement",
+    "fixtures": "Calendrier",
+    "topScorers": "Meilleurs buteurs",
+    "results": "Résultats",
+    "blogs": "Blog",
+    "menu": "Menu"
+  },
+  "common": {
+    "live": "En direct",
+    "finished": "Terminé",
+    "upcoming": "À venir",
+    "all": "Tous",
+    "today": "Aujourd'hui",
+    "venue": "Stade",
+    "matchday": "Journée",
+    "loading": "Chargement...",
+    "toggleTheme": "Basculer clair / sombre",
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système",
+    "language": "Langue",
+    "goals": "Buts",
+    "vs": "vs"
+  },
+  "home": {
+    "title": "KooraLive — Résultats en direct de la Botola Pro",
+    "description": "Suivez les scores en direct, le classement et les résultats de la Botola Pro marocaine.",
+    "fixturesHeading": "Rencontres du jour",
+    "standingsHeading": "Classement",
+    "viewFullStandings": "Classement complet",
+    "noMatches": "Aucun match dans cette catégorie.",
+    "teamOfTheWeek": "Équipe de la semaine"
+  },
+  "match": {
+    "overview": "Aperçu",
+    "lineups": "Compositions",
+    "playerStats": "Stats joueurs",
+    "stats": "Statistiques",
+    "standings": "Classement",
+    "h2h": "Face à face",
+    "media": "Médias",
+    "startingXI": "Titulaires",
+    "substitutes": "Remplaçants",
+    "possession": "Possession",
+    "shots": "Tirs",
+    "shotsOnTarget": "Tirs cadrés",
+    "corners": "Corners",
+    "fouls": "Fautes",
+    "yellowCards": "Cartons jaunes",
+    "redCards": "Cartons rouges",
+    "noPreviousMeetings": "Aucune confrontation précédente disponible.",
+    "leaguePosition": "Position au classement",
+    "noLineups": "Compositions pas encore disponibles.",
+    "noStats": "Statistiques pas encore disponibles.",
+    "noMedia": "Temps forts bientôt disponibles."
+  },
+  "standings": {
+    "position": "#",
+    "team": "Équipe",
+    "played": "J",
+    "won": "G",
+    "drawn": "N",
+    "lost": "P",
+    "goalsFor": "BP",
+    "goalsAgainst": "BC",
+    "goalDifference": "Diff",
+    "points": "Pts",
+    "form": "Forme",
+    "legendTitle": "Légende",
+    "continental": "Compétitions continentales",
+    "relegation": "Zone de relégation"
+  },
+  "team": {
+    "squad": "Effectif",
+    "recentForm": "Forme récente",
+    "upcomingFixtures": "Prochains matchs",
+    "leaguePosition": "Position au classement",
+    "tabMatches": "Matchs",
+    "tabStats": "Statistiques",
+    "tabStandings": "Classement",
+    "latestMatches": "Derniers matchs",
+    "trophies": "Trophées",
+    "noTrophies": "Aucun trophée enregistré.",
+    "seasons": "Titres récents"
+  },
+  "player": {
+    "profile": "Joueur",
+    "seasonStats": "Statistiques de la saison",
+    "recentRatings": "Notes récentes",
+    "rating": "Note",
+    "assists": "Passes décisives",
+    "appearances": "Matchs joués",
+    "minutes": "Min",
+    "matchesTab": "Matchs",
+    "seasonTab": "Saison",
+    "careerTab": "Carrière",
+    "summaryLastMonths": "Résumé (matchs récents)",
+    "nationality": "Nationalité",
+    "age": "Âge",
+    "years": "ans",
+    "position": "Poste",
+    "height": "Taille",
+    "preferredFoot": "Pied fort",
+    "shirtNumber": "Numéro",
+    "foot": {
+      "left": "Gauche",
+      "right": "Droit",
+      "both": "Les deux"
+    },
+    "positions": {
+      "GK": "Gardien",
+      "DF": "Défenseur",
+      "MF": "Milieu",
+      "FW": "Attaquant"
+    }
+  },
+  "blogs": {
+    "title": "Blog — KooraLive",
+    "heading": "Blog",
+    "description": "Avant-matchs, récaps et histoires de la Botola Pro.",
+    "disclaimer": "Contenu éditorial pour les fans — indépendant de la FRMF."
+  },
+  "competition": {
+    "metaTitle": "Botola Pro — Classement, calendrier et stats",
+    "metaDescription": "Classement en direct, calendrier, statistiques joueurs et infos de la Botola Pro.",
+    "name": "Botola Pro",
+    "country": "Maroc",
+    "season": "2025/26",
+    "seasonStart": "Août 2025",
+    "seasonEnd": "Mai 2026",
+    "favourite": "Favori",
+    "followers": "Championnat élite du Maroc",
+    "matches": "Matchs",
+    "byRound": "Par journée",
+    "byDate": "Par date",
+    "featured": "À la une",
+    "tabStandings": "Classement",
+    "tabStats": "Stats",
+    "tabDetails": "Détails",
+    "tabMedia": "Médias",
+    "filterAll": "Tous",
+    "filterHome": "Domicile",
+    "filterAway": "Extérieur",
+    "playerStats": "Stats joueurs",
+    "statGeneral": "Général",
+    "statAttack": "Attaque",
+    "statDefense": "Défense",
+    "statPassing": "Passes",
+    "statGoalkeeping": "Gardien",
+    "noMedia": "Médias bientôt disponibles.",
+    "detailsBody": "La Botola Pro est le championnat élite du Maroc : 16 clubs s’affrontent pour le titre et les places continentales.",
+    "countryLabel": "Pays",
+    "seasonLabel": "Saison",
+    "teamsLabel": "Équipes"
+  },
+  "ads": {
+    "advertisement": "Publicité"
+  },
+  "footer": {
+    "rights": "Tous droits réservés.",
+    "disclaimer": "KooraLive n'est pas affilié à la FRMF."
+  },
+  "search": {
+    "label": "Recherche",
+    "placeholder": "Rechercher matchs, équipes, joueurs…",
+    "empty": "Aucun résultat.",
+    "clear": "Effacer la recherche",
+    "kinds": {
+      "team": "Équipe",
+      "player": "Joueur",
+      "match": "Match"
+    }
+  },
+  "ticker": {
+    "label": "Matchs de la semaine",
+    "thisWeek": "Cette semaine"
+  }
+}

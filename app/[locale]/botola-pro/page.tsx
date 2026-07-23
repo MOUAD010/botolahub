@@ -1,0 +1,164 @@
+import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { routing } from "@/lib/i18n/routing";
+import {
+  matchRepository,
+  playerRepository,
+  standingsRepository,
+} from "@/lib/repositories";
+import { BOTOLA_PRO } from "@/data/matches.mock";
+import { teamOfTheWeek, totwWeekLabel } from "@/data/totw.mock";
+import type { PlayerSeasonStats } from "@/lib/types";
+import { AdSlot } from "@/components/ads/AdSlot";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { CompetitionHeader } from "@/components/competition/CompetitionHeader";
+import { CompetitionMatchesSidebar } from "@/components/competition/CompetitionMatchesSidebar";
+import { CompetitionMainTabs } from "@/components/competition/CompetitionMainTabs";
+import { buildCanonical, buildLanguageAlternates } from "@/lib/seo/alternates";
+
+export const revalidate = 60;
+
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "competition" });
+
+  return {
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+    alternates: {
+      canonical: buildCanonical(locale, "/botola-pro"),
+      languages: buildLanguageAlternates("/botola-pro"),
+    },
+  };
+}
+
+export default async function BotolaProPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const [matches, standings, topScorers, t, tNav, tCommon, tStandings, tPlayer] =
+    await Promise.all([
+      matchRepository.getByCompetition(BOTOLA_PRO.id),
+      standingsRepository.getStandings(BOTOLA_PRO.id),
+      playerRepository.getTopScorers(25),
+      getTranslations({ locale, namespace: "competition" }),
+      getTranslations({ locale, namespace: "nav" }),
+      getTranslations({ locale, namespace: "common" }),
+      getTranslations({ locale, namespace: "standings" }),
+      getTranslations({ locale, namespace: "player" }),
+    ]);
+
+  const totwStatsEntries = await Promise.all(
+    teamOfTheWeek.startingXI.map(
+      async (p) =>
+        [p.id, await playerRepository.getSeasonStats(p.id)] as const
+    )
+  );
+  const totwStatsById: Record<string, PlayerSeasonStats | null> =
+    Object.fromEntries(totwStatsEntries);
+
+  return (
+    <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col gap-5 px-4 py-5 sm:px-6 xl:px-8">
+      <Breadcrumbs
+        locale={locale}
+        items={[
+          { name: tNav("home"), href: "/" },
+          { name: tNav("botolaPro"), href: "/botola-pro" },
+        ]}
+      />
+
+      <CompetitionHeader
+        name={t("name")}
+        country={t("country")}
+        season={t("season")}
+        seasonProgress={42}
+        seasonStart={t("seasonStart")}
+        seasonEnd={t("seasonEnd")}
+        favouriteLabel={t("favourite")}
+        followersLabel={t("followers")}
+      />
+
+      <div className="grid gap-5 xl:grid-cols-[300px_minmax(0,1fr)_280px]">
+        <div className="order-2 min-w-0 xl:order-1">
+          <CompetitionMatchesSidebar
+            matches={matches}
+            labels={{
+              matches: t("matches"),
+              byRound: t("byRound"),
+              byDate: t("byDate"),
+              round: tCommon("matchday"),
+              finished: tCommon("finished"),
+              live: tCommon("live"),
+              featured: t("featured"),
+            }}
+          />
+        </div>
+
+        <div className="order-1 min-w-0 xl:order-2">
+          <CompetitionMainTabs
+            standings={standings}
+            topScorers={topScorers}
+            totw={teamOfTheWeek}
+            totwWeekLabel={totwWeekLabel}
+            totwStatsById={totwStatsById}
+            labels={{
+              standings: t("tabStandings"),
+              stats: t("tabStats"),
+              details: t("tabDetails"),
+              media: t("tabMedia"),
+              all: t("filterAll"),
+              home: t("filterHome"),
+              away: t("filterAway"),
+              team: tStandings("team"),
+              played: tStandings("played"),
+              won: tStandings("won"),
+              drawn: tStandings("drawn"),
+              lost: tStandings("lost"),
+              diff: tStandings("goalDifference"),
+              goals: tCommon("goals"),
+              form: tStandings("form"),
+              points: tStandings("points"),
+              continental: tStandings("continental"),
+              relegation: tStandings("relegation"),
+              playerStats: t("playerStats"),
+              general: t("statGeneral"),
+              attack: t("statAttack"),
+              defense: t("statDefense"),
+              passing: t("statPassing"),
+              goalkeeping: t("statGoalkeeping"),
+              player: tPlayer("profile"),
+              rating: tPlayer("rating"),
+              assists: tPlayer("assists"),
+              appearances: tPlayer("appearances"),
+              noMedia: t("noMedia"),
+              detailsBody: t("detailsBody"),
+              countryLabel: t("countryLabel"),
+              countryValue: t("country"),
+              seasonLabel: t("seasonLabel"),
+              seasonValue: t("season"),
+              teamsLabel: t("teamsLabel"),
+              teamsValue: "16",
+            }}
+          />
+        </div>
+
+        <aside className="order-3 flex flex-col gap-5 xl:sticky xl:top-20 xl:h-fit">
+          <AdSlot placement="sidebar-rectangle" className="flex lg:flex" />
+          <AdSlot placement="sidebar-rectangle" className="flex lg:flex" />
+        </aside>
+      </div>
+    </div>
+  );
+}
