@@ -1,19 +1,15 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { routing, type Locale } from "@/lib/i18n/routing";
+import { type Locale } from "@/lib/i18n/routing";
 import { Link } from "@/lib/i18n/navigation";
 import { toIntlLocale } from "@/lib/i18n/format";
-import { blogPosts } from "@/data/blogs.mock";
+import { listPublishedNews } from "@/lib/repositories/news";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { buildCanonical, buildLanguageAlternates } from "@/lib/seo/alternates";
 import { cn } from "@/lib/utils";
 
-export const revalidate = 300;
-
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -21,19 +17,19 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "blogs" });
+  const t = await getTranslations({ locale, namespace: "news" });
 
   return {
     title: t("title"),
     description: t("description"),
     alternates: {
-      canonical: buildCanonical(locale, "/blogs"),
-      languages: buildLanguageAlternates("/blogs"),
+      canonical: buildCanonical(locale, "/news"),
+      languages: buildLanguageAlternates("/news"),
     },
   };
 }
 
-export default async function BlogsPage({
+export default async function NewsPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
@@ -41,9 +37,10 @@ export default async function BlogsPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [t, tNav] = await Promise.all([
-    getTranslations({ locale, namespace: "blogs" }),
+  const [t, tNav, posts] = await Promise.all([
+    getTranslations({ locale, namespace: "news" }),
     getTranslations({ locale, namespace: "nav" }),
+    listPublishedNews(),
   ]);
 
   const loc = locale as Locale;
@@ -53,18 +50,13 @@ export default async function BlogsPage({
     year: "numeric",
   });
 
-  const posts = [...blogPosts].sort(
-    (a, b) =>
-      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-  );
-
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-6 sm:px-6 xl:px-8">
       <Breadcrumbs
         locale={locale}
         items={[
           { name: tNav("home"), href: "/" },
-          { name: tNav("blogs"), href: "/blogs" },
+          { name: tNav("news"), href: "/news" },
         ]}
       />
 
@@ -82,22 +74,33 @@ export default async function BlogsPage({
           {posts.map((post) => (
             <li key={post.id}>
               <Link
-                href={`/blogs/${post.slug}`}
+                href={`/news/${post.slug}`}
                 className="group flex cursor-pointer flex-col overflow-hidden rounded-xl border border-border bg-card transition-colors hover:border-primary/30 hover:bg-muted/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex-row"
               >
-                <div
-                  className={cn(
-                    "h-36 w-full shrink-0 bg-linear-to-br sm:h-auto sm:w-48",
-                    post.coverGradient
-                  )}
-                />
+                {post.coverUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={post.coverUrl}
+                    alt=""
+                    className="h-36 w-full shrink-0 object-cover sm:h-auto sm:w-48"
+                  />
+                ) : (
+                  <div
+                    className={cn(
+                      "h-36 w-full shrink-0 bg-linear-to-br sm:h-auto sm:w-48",
+                      post.coverGradient
+                    )}
+                  />
+                )}
                 <div className="flex flex-1 flex-col gap-2 p-5">
-                  <time
-                    dateTime={post.publishedAt}
-                    className="text-sm text-muted-foreground"
-                  >
-                    {dateFormatter.format(new Date(post.publishedAt))}
-                  </time>
+                  {post.publishedAt ? (
+                    <time
+                      dateTime={post.publishedAt}
+                      className="text-sm text-muted-foreground"
+                    >
+                      {dateFormatter.format(new Date(post.publishedAt))}
+                    </time>
+                  ) : null}
                   <h2 className="text-xl font-semibold text-foreground group-hover:text-link">
                     {post.title[loc]}
                   </h2>
@@ -113,6 +116,9 @@ export default async function BlogsPage({
                         {tag}
                       </span>
                     ))}
+                    <span className="text-xs text-muted-foreground">
+                      {t("views", { count: post.viewCount })}
+                    </span>
                   </div>
                 </div>
               </Link>

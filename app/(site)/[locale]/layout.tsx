@@ -14,7 +14,8 @@ import { SITE_NAME, SITE_URL } from "@/lib/seo/site";
 import { buildLanguageAlternates } from "@/lib/seo/alternates";
 import { matchRepository } from "@/lib/repositories";
 import { BOTOLA_PRO } from "@/data/matches.mock";
-import "../globals.css";
+import { PageviewTracker } from "@/components/analytics/PageviewTracker";
+import "../../globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -127,6 +128,7 @@ export default async function LocaleLayout({
                 <main id="main-content" className="flex flex-1 flex-col">
                   {children}
                 </main>
+                <PageviewTracker />
               </TooltipProvider>
             </ThemeProvider>
           </DirectionProvider>

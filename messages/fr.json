@@ -6,7 +6,7 @@
     "fixtures": "Calendrier",
     "topScorers": "Meilleurs buteurs",
     "results": "Résultats",
-    "blogs": "Blog",
+    "news": "Actualités",
     "menu": "Menu"
   },
   "common": {
@@ -118,11 +118,14 @@
       "FW": "Attaquant"
     }
   },
-  "blogs": {
-    "title": "Blog — KooraLive",
-    "heading": "Blog",
+  "news": {
+    "title": "Actualités — KooraLive",
+    "heading": "Actualités",
     "description": "Avant-matchs, récaps et histoires de la Botola Pro.",
-    "disclaimer": "Contenu éditorial pour les fans — indépendant de la FRMF."
+    "disclaimer": "Contenu éditorial pour les fans — indépendant de la FRMF.",
+    "views": "{count} vues",
+    "relatedPlayers": "Joueurs",
+    "relatedMatches": "Matchs"
   },
   "competition": {
     "metaTitle": "Botola Pro — Classement, calendrier et stats",

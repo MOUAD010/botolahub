@@ -13,6 +13,20 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "**" },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/:locale/blogs",
+        destination: "/:locale/news",
+        permanent: true,
+      },
+      {
+        source: "/:locale/blogs/:slug",
+        destination: "/:locale/news/:slug",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);

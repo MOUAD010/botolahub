@@ -18,7 +18,7 @@ import { LocaleSwitcher } from "./LocaleSwitcher";
 const navItems = [
   { href: "/" as const, key: "home" },
   { href: "/botola-pro" as const, key: "botolaPro" },
-  { href: "/blogs" as const, key: "blogs" },
+  { href: "/news" as const, key: "news" },
 ];
 
 export function MobileNav() {

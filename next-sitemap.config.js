@@ -6,11 +6,11 @@ const defaultLocale = "fr";
 module.exports = {
   siteUrl,
   generateRobotsTxt: true,
-  exclude: ["/*/styleguide"],
+  exclude: ["/*/styleguide", "/admin", "/admin/*"],
   robotsTxtOptions: {
     policies: [
       { userAgent: "*", allow: "/" },
-      { userAgent: "*", disallow: ["/*/styleguide"] },
+      { userAgent: "*", disallow: ["/*/styleguide", "/admin", "/admin/*"] },
     ],
   },
   transform: async (config, path) => {

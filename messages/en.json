@@ -6,7 +6,7 @@
     "fixtures": "Fixtures",
     "topScorers": "Top Scorers",
     "results": "Results",
-    "blogs": "Blog",
+    "news": "News",
     "menu": "Menu"
   },
   "common": {
@@ -118,11 +118,14 @@
       "FW": "Forward"
     }
   },
-  "blogs": {
-    "title": "Blog — KooraLive",
-    "heading": "Blog",
+  "news": {
+    "title": "News — KooraLive",
+    "heading": "News",
     "description": "Previews, roundups, and stories from Botola Pro.",
-    "disclaimer": "Editorial content for fans — independent of the FRMF."
+    "disclaimer": "Editorial content for fans — independent of the FRMF.",
+    "views": "{count} views",
+    "relatedPlayers": "Players",
+    "relatedMatches": "Matches"
   },
   "competition": {
     "metaTitle": "Botola Pro — Standings, fixtures & stats",
