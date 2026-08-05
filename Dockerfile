@@ -16,6 +16,9 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+# Headroom for the type-check + static generation phases, which exceed the
+# default V8 heap on small build machines.
+ENV NODE_OPTIONS=--max-old-space-size=4096
 # Public site URL used by next-sitemap / SEO helpers at build time
 ARG SITE_URL=https://kooralive.example.com
 ENV SITE_URL=$SITE_URL

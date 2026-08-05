@@ -58,8 +58,10 @@ export async function getSearchConsoleOverview(): Promise<GscOverview> {
     return cache.data;
   }
 
-  const { google } = await import("googleapis");
-  const oauth2 = new google.auth.OAuth2(
+  const { searchconsole: searchconsoleApi, auth } = await import(
+    "@googleapis/searchconsole"
+  );
+  const oauth2 = new auth.OAuth2(
     process.env.GSC_CLIENT_ID,
     process.env.GSC_CLIENT_SECRET
   );
@@ -67,7 +69,7 @@ export async function getSearchConsoleOverview(): Promise<GscOverview> {
     refresh_token: process.env.GSC_REFRESH_TOKEN,
   });
 
-  const searchconsole = google.searchconsole({ version: "v1", auth: oauth2 });
+  const searchconsole = searchconsoleApi({ version: "v1", auth: oauth2 });
   const end = new Date();
   end.setUTCDate(end.getUTCDate() - 3); // GSC data lag
   const start = new Date(end);
