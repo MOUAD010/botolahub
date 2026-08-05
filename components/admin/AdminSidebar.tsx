@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ArrowLeft,
+  ImageIcon,
   LayoutDashboard,
   LogOut,
   Megaphone,
@@ -19,6 +20,7 @@ const nav = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/admin/news", label: "News", icon: Newspaper },
   { href: "/admin/ads", label: "Ads", icon: Megaphone },
+  { href: "/admin/media", label: "Media", icon: ImageIcon },
   { href: "/admin/sync", label: "Football sync", icon: RefreshCw },
   { href: "/admin/ranking", label: "Ranking", icon: Search },
 ];
