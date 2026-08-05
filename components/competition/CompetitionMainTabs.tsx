@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { Link } from "@/lib/i18n/navigation";
-import type { PlayerSeasonStats, Standing } from "@/lib/types";
+import type { Match, PlayerSeasonStats, Standing } from "@/lib/types";
 import type { TopScorerEntry } from "@/lib/repositories/types";
 import { FormBadges } from "@/components/standings/FormBadges";
 import { PlayerAvatar } from "@/components/player/PlayerAvatar";
@@ -27,6 +27,11 @@ type StatCategory =
   | "defense"
   | "passing"
   | "goalkeeping";
+
+type DisplayStanding = Standing & {
+  isLive: boolean;
+  livePointsDelta: number;
+};
 
 function formatDiff(diff: number): string {
   return diff > 0 ? `+${diff}` : `${diff}`;
@@ -61,13 +66,70 @@ function filterStandings(rows: Standing[], filter: VenueFilter): Standing[] {
     .map((row, i) => ({ ...row, position: i + 1 }));
 }
 
+function withLiveResults(
+  rows: Standing[],
+  matches: Match[],
+  enabled: boolean
+): DisplayStanding[] {
+  const display = new Map(
+    rows.map((row) => [
+      row.team.id,
+      { ...row, isLive: false, livePointsDelta: 0 },
+    ])
+  );
+  if (!enabled) return [...display.values()];
+
+  for (const match of matches) {
+    if (match.status !== "live") continue;
+    const home = display.get(match.homeTeam.id);
+    const away = display.get(match.awayTeam.id);
+    if (!home || !away) continue;
+
+    const homeScore = match.homeScore ?? 0;
+    const awayScore = match.awayScore ?? 0;
+    const homePoints = homeScore > awayScore ? 3 : homeScore === awayScore ? 1 : 0;
+    const awayPoints = awayScore > homeScore ? 3 : homeScore === awayScore ? 1 : 0;
+
+    home.isLive = true;
+    home.livePointsDelta = homePoints;
+    home.played += 1;
+    home.goalsFor += homeScore;
+    home.goalsAgainst += awayScore;
+    home.points += homePoints;
+    home.won += homePoints === 3 ? 1 : 0;
+    home.drawn += homePoints === 1 ? 1 : 0;
+    home.lost += homePoints === 0 ? 1 : 0;
+
+    away.isLive = true;
+    away.livePointsDelta = awayPoints;
+    away.played += 1;
+    away.goalsFor += awayScore;
+    away.goalsAgainst += homeScore;
+    away.points += awayPoints;
+    away.won += awayPoints === 3 ? 1 : 0;
+    away.drawn += awayPoints === 1 ? 1 : 0;
+    away.lost += awayPoints === 0 ? 1 : 0;
+  }
+
+  return [...display.values()]
+    .sort(
+      (a, b) =>
+        b.points - a.points ||
+        b.goalsFor - b.goalsAgainst - (a.goalsFor - a.goalsAgainst) ||
+        b.goalsFor - a.goalsFor
+    )
+    .map((row, index) => ({ ...row, position: index + 1 }));
+}
+
 export function CompetitionMainTabs({
   standings,
+  matches,
   topScorers,
   totw,
   labels,
 }: {
   standings: Standing[];
+  matches: Match[];
   topScorers: TopScorerEntry[];
   totw: TotwPayload | null;
   labels: {
@@ -100,6 +162,7 @@ export function CompetitionMainTabs({
     assists: string;
     appearances: string;
     noMedia: string;
+    live: string;
     detailsBody: string;
     countryLabel: string;
     countryValue: string;
@@ -115,6 +178,10 @@ export function CompetitionMainTabs({
   const filtered = useMemo(
     () => filterStandings(standings, venue),
     [standings, venue]
+  );
+  const displayed = useMemo(
+    () => withLiveResults(filtered, matches, venue === "all"),
+    [filtered, matches, venue]
   );
 
   const hasContinental = standings.some((s) => s.zone === "continental");
@@ -199,7 +266,7 @@ export function CompetitionMainTabs({
               </tr>
             </thead>
             <tbody>
-              {filtered.map((row) => (
+              {displayed.map((row) => (
                 <tr
                   key={`${venue}-${row.team.id}`}
                   className="border-b border-border last:border-0 hover:bg-muted/40"
@@ -226,6 +293,18 @@ export function CompetitionMainTabs({
                         className="size-[22px]"
                       />
                       <span className="truncate">{row.team.name}</span>
+                      {row.isLive ? (
+                        <span
+                          className="inline-flex shrink-0 items-center gap-1 text-[10px] font-bold uppercase text-red-600"
+                          title={labels.live}
+                        >
+                          <span className="relative flex size-2">
+                            <span className="absolute inline-flex size-full animate-ping rounded-full bg-red-500 opacity-75" />
+                            <span className="relative inline-flex size-2 rounded-full bg-red-600" />
+                          </span>
+                          {labels.live}
+                        </span>
+                      ) : null}
                     </Link>
                   </td>
                   <td className="px-2 py-2.5 text-center tabular-nums">
@@ -258,7 +337,12 @@ export function CompetitionMainTabs({
                     />
                   </td>
                   <td className="px-3 py-2.5 text-center text-base font-bold tabular-nums">
-                    {row.points}
+                    <span>{row.points}</span>
+                    {row.isLive ? (
+                      <span className="ms-1 text-[10px] font-semibold text-red-600">
+                        +{row.livePointsDelta}
+                      </span>
+                    ) : null}
                   </td>
                 </tr>
               ))}

@@ -16,6 +16,39 @@ services:
       HOSTNAME: 0.0.0.0
     restart: unless-stopped
 
+  live-worker:
+    image: kooralive:latest
+    container_name: kooralive-live-worker
+    depends_on:
+      - web
+    environment:
+      NODE_ENV: production
+      AUTH_SECRET: ${AUTH_SECRET}
+      CRON_SECRET: ${CRON_SECRET:-}
+      LIVE_POLL_INTERVAL_SECONDS: ${LIVE_POLL_INTERVAL_SECONDS:-480}
+    command:
+      - sh
+      - -c
+      - |
+        echo "[live-worker] starting automatic live checks every $${LIVE_POLL_INTERVAL_SECONDS}s"
+        while true; do
+          SECRET="$${CRON_SECRET:-$${AUTH_SECRET}}"
+          STARTED="$$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "[live-worker] $${STARTED} checking match window"
+          if wget -qO- --timeout=310 \
+            --header="Authorization: Bearer $${SECRET}" \
+            --post-data="" \
+            http://web:3000/api/internal/live-sync; then
+            echo
+            echo "[live-worker] cycle completed"
+          else
+            CODE="$$?"
+            echo "[live-worker] cycle failed (wget exit $${CODE}); retrying next interval" >&2
+          fi
+          sleep "$${LIVE_POLL_INTERVAL_SECONDS}"
+        done
+    restart: unless-stopped
+
   # Hot-reload development (optional)
   # Usage: docker compose --profile dev up web-dev
   web-dev:

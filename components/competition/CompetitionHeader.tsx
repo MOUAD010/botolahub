@@ -1,11 +1,13 @@
 "use client";
 
+import Image from "next/image";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export function CompetitionHeader({
   name,
+  logoUrl,
   country,
   season,
   seasonProgress,
@@ -15,6 +17,7 @@ export function CompetitionHeader({
   followersLabel,
 }: {
   name: string;
+  logoUrl: string;
   country: string;
   season: string;
   seasonProgress: number;
@@ -29,8 +32,15 @@ export function CompetitionHeader({
     <header className="rounded-xl border border-border bg-card p-4 sm:p-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-4">
-          <div className="flex size-16 shrink-0 items-center justify-center rounded-xl bg-primary text-xl font-bold text-primary-foreground sm:size-20 sm:text-2xl">
-            KL
+          <div className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-white p-2 sm:size-20">
+            <Image
+              src={logoUrl}
+              alt={`${name} logo`}
+              fill
+              sizes="80px"
+              unoptimized
+              className="object-contain p-2"
+            />
           </div>
           <div className="min-w-0 flex flex-col gap-1.5">
             <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -39,10 +49,9 @@ export function CompetitionHeader({
             <p className="text-sm text-muted-foreground">{followersLabel}</p>
             <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
               <span className="inline-flex items-center gap-1.5 rounded-md bg-muted px-2 py-1 font-medium text-foreground">
-                <span
-                  aria-hidden
-                  className="inline-block size-3.5 rounded-sm bg-red-600"
-                />
+                <span aria-hidden className="text-base leading-none">
+                  🇲🇦
+                </span>
                 {country}
               </span>
               <span className="rounded-md border border-border bg-background px-2.5 py-1 font-medium text-foreground">

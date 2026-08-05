@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
   competitionSeasons,
@@ -21,6 +21,7 @@ import {
 } from "@/lib/api-football/constants";
 import {
   getFixtureEvents,
+  getFixtureById,
   getFixtureLineups,
   getFixtureStatistics,
   getFixturesByLeague,
@@ -53,6 +54,12 @@ export type SyncJob =
   | "match-detail"
   | "topscorers"
   | "full";
+
+export type AutoLiveCycleResult = {
+  action: "skipped" | "polled" | "error";
+  status: "ok" | "error";
+  message: string;
+};
 
 type SyncResult = {
   kind: SyncJob;
@@ -445,13 +452,26 @@ export async function syncLiveJob(): Promise<SyncResult> {
   const run = await startRun("live");
   let requests = 0;
   try {
+    const competitionIds = TRACKED_LEAGUE_IDS.map(competitionIdFromApi);
+    const previousLive = await db
+      .select()
+      .from(fixtures)
+      .where(
+        and(
+          inArray(fixtures.competitionId, competitionIds),
+          eq(fixtures.status, "live")
+        )
+      );
+
     const liveParam = TRACKED_LEAGUE_IDS.join("-");
     const { response } = await getFixturesLive(liveParam);
     requests += 1;
+    const currentLiveIds = new Set(response.map((row) => row.fixture.id));
 
     for (const row of response) {
       await upsertFixtureRow(row);
-      // Enrich live matches with events (1 call each — keep budget in mind)
+      // Events and statistics change during play. Lineups are effectively
+      // static, so only fetch them until the first successful response.
       const [fx] = await db
         .select()
         .from(fixtures)
@@ -459,37 +479,174 @@ export async function syncLiveJob(): Promise<SyncResult> {
         .limit(1);
       if (!fx) continue;
 
-      const [eventsRes, lineupsRes] = await Promise.all([
+      const [existing] = await db
+        .select()
+        .from(fixtureDetails)
+        .where(eq(fixtureDetails.fixtureId, fx.id))
+        .limit(1);
+      const [eventsRes, statsRes, lineupsRes] = await Promise.all([
         getFixtureEvents(row.fixture.id),
-        getFixtureLineups(row.fixture.id),
+        getFixtureStatistics(row.fixture.id),
+        existing?.lineups
+          ? Promise.resolve(null)
+          : getFixtureLineups(row.fixture.id),
       ]);
-      requests += 2;
+      requests += lineupsRes ? 3 : 2;
 
       await db
         .insert(fixtureDetails)
         .values({
           fixtureId: fx.id,
           events: eventsRes.response,
-          lineups: lineupsRes.response,
+          lineups: lineupsRes?.response ?? existing?.lineups ?? null,
+          statistics: statsRes.response,
           updatedAt: new Date(),
         })
         .onConflictDoUpdate({
           target: fixtureDetails.fixtureId,
           set: {
             events: eventsRes.response,
-            lineups: lineupsRes.response,
+            lineups: lineupsRes?.response ?? existing?.lineups ?? undefined,
+            statistics: statsRes.response,
             updatedAt: new Date(),
           },
         });
     }
 
-    const msg = `Live sync: ${response.length} in-play fixtures`;
+    // API-Football's live endpoint stops returning a fixture once it ends.
+    // Re-fetch fixtures that were live in our DB but disappeared so they do
+    // not remain stuck as "live" forever.
+    const disappeared = previousLive.filter(
+      (fixture) => !currentLiveIds.has(fixture.apiId)
+    );
+    let reconciled = 0;
+    let reconciledFinished = 0;
+    for (const previous of disappeared) {
+      const finalRes = await getFixtureById(previous.apiId);
+      requests += 1;
+      const finalRow = finalRes.response[0];
+      if (!finalRow) continue;
+      await upsertFixtureRow(finalRow);
+      reconciled += 1;
+
+      if (mapFixtureStatus(finalRow.fixture.status.short) === "finished") {
+        reconciledFinished += 1;
+        const [eventsRes, lineupsRes, statsRes] = await Promise.all([
+          getFixtureEvents(previous.apiId),
+          getFixtureLineups(previous.apiId),
+          getFixtureStatistics(previous.apiId),
+        ]);
+        requests += 3;
+        await db
+          .insert(fixtureDetails)
+          .values({
+            fixtureId: previous.id,
+            events: eventsRes.response,
+            lineups: lineupsRes.response,
+            statistics: statsRes.response,
+            updatedAt: new Date(),
+          })
+          .onConflictDoUpdate({
+            target: fixtureDetails.fixtureId,
+            set: {
+              events: eventsRes.response,
+              lineups: lineupsRes.response,
+              statistics: statsRes.response,
+              updatedAt: new Date(),
+            },
+          });
+      }
+    }
+
+    const shouldFinalize =
+      previousLive.length > 0 &&
+      response.length === 0 &&
+      disappeared.length > 0 &&
+      reconciledFinished === disappeared.length;
+
+    const msg = [
+      `Live sync: ${response.length} in-play fixtures`,
+      `${reconciled} finished fixtures reconciled`,
+      shouldFinalize
+        ? "last match ended; post-match refresh started"
+        : "no final sync needed",
+    ].join("; ");
     await finishRun(run.id, "ok", requests, msg);
+
+    // Run this after closing the live log so failures in a child job remain
+    // visible as their own syncRuns entries instead of hiding this snapshot.
+    // Prefer fixtures + standings + topscorers over syncFull(): squads alone
+    // can burn ~16 free-plan requests and are unnecessary after every matchday.
+    if (shouldFinalize) {
+      await syncPostMatchRefresh();
+    }
+
     return { kind: "live", status: "ok", requestsUsed: requests, message: msg };
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Live sync failed";
     await finishRun(run.id, "error", requests, msg);
     return { kind: "live", status: "error", requestsUsed: requests, message: msg };
+  }
+}
+
+/**
+ * Cheap DB gate for the long-running worker. It only calls API-Football when
+ * a tracked fixture is live or within the match window (20 min before kickoff
+ * until four hours after). Every decision is persisted in syncRuns and also
+ * emitted to stdout for Coolify logs.
+ */
+export async function runAutoLiveCycle(
+  now = new Date()
+): Promise<AutoLiveCycleResult> {
+  const run = await startRun("auto-live");
+  try {
+    const competitionIds = TRACKED_LEAGUE_IDS.map(competitionIdFromApi);
+    const windowStart = new Date(now.getTime() - 4 * 60 * 60 * 1000);
+    const windowEnd = new Date(now.getTime() + 20 * 60 * 1000);
+    const candidates = await db
+      .select()
+      .from(fixtures)
+      .where(
+        and(
+          inArray(fixtures.competitionId, competitionIds),
+          gte(fixtures.kickoff, windowStart),
+          lte(fixtures.kickoff, windowEnd)
+        )
+      );
+    const due = candidates.filter(
+      (fixture) =>
+        fixture.status === "live" ||
+        (fixture.status === "upcoming" &&
+          fixture.kickoff.getTime() <= windowEnd.getTime())
+    );
+
+    if (due.length === 0) {
+      const message = `Skipped: no Botola fixture in the live window at ${now.toISOString()}`;
+      await finishRun(run.id, "ok", 0, message);
+      console.log(`[auto-live] ${message}`);
+      return { action: "skipped", status: "ok", message };
+    }
+
+    const result = await syncLiveJob();
+    const message = `Polled ${due.length} candidate fixtures: ${result.message}`;
+    await finishRun(
+      run.id,
+      result.status,
+      result.requestsUsed,
+      message
+    );
+    console.log(`[auto-live] ${message}`);
+    return {
+      action: "polled",
+      status: result.status,
+      message,
+    };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Automatic live cycle failed";
+    await finishRun(run.id, "error", 0, message);
+    console.error(`[auto-live] ${message}`);
+    return { action: "error", status: "error", message };
   }
 }
 
@@ -673,6 +830,15 @@ export async function syncFull(): Promise<SyncResult[]> {
   results.push(await syncStandingsJob());
   results.push(await syncFixturesJob());
   results.push(await syncSquadsJob());
+  results.push(await syncTopScorersJob());
+  return results;
+}
+
+/** End-of-matchday refresh: official tables without the expensive squads pull. */
+export async function syncPostMatchRefresh(): Promise<SyncResult[]> {
+  const results: SyncResult[] = [];
+  results.push(await syncFixturesJob());
+  results.push(await syncStandingsJob());
   results.push(await syncTopScorersJob());
   return results;
 }

@@ -29,7 +29,7 @@ export async function GET() {
   try {
     const [quota, runs] = await Promise.all([
       getApiQuota().catch(() => null),
-      getLatestSyncRuns(12),
+      getLatestSyncRuns(30),
     ]);
     return NextResponse.json({
       quota,

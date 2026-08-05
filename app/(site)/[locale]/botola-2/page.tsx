@@ -74,6 +74,7 @@ export default async function Botola2Page({
 
       <CompetitionHeader
         name={t("name")}
+        logoUrl="/media/leagues/201.png"
         country={t("country")}
         season={t("season")}
         seasonProgress={42}
@@ -102,6 +103,7 @@ export default async function Botola2Page({
         <div className="order-1 min-w-0 xl:order-2">
           <CompetitionMainTabs
             standings={standings}
+            matches={matches}
             topScorers={[]}
             totw={totw}
             labels={{
@@ -134,6 +136,7 @@ export default async function Botola2Page({
               assists: tPlayer("assists"),
               appearances: tPlayer("appearances"),
               noMedia: t("noMedia"),
+              live: tCommon("live"),
               detailsBody: t("detailsBody"),
               countryLabel: t("countryLabel"),
               countryValue: t("country"),

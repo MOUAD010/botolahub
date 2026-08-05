@@ -89,6 +89,7 @@ export default function AdminSyncPage() {
   const limit = quota?.requests?.limit_day ?? 100;
   const remaining =
     typeof used === "number" ? Math.max(0, limit - used) : null;
+  const latestAutoRun = runs.find((run) => run.kind === "auto-live");
 
   return (
     <div className="space-y-8">
@@ -164,6 +165,41 @@ export default function AdminSyncPage() {
               : null}
           </p>
         </div>
+      </section>
+
+      <section className="rounded-xl border border-border bg-card p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold">Automatic live monitor</h2>
+            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+              The production worker checks every 8 minutes. It reads the
+              schedule from Postgres first, calls API-Football only near a
+              kickoff, and after the final live match ends it refreshes
+              fixtures, standings, and scorers (not squads).
+            </p>
+          </div>
+          <span
+            className={cn(
+              "rounded-md px-2 py-1 text-xs font-medium",
+              latestAutoRun?.status === "error"
+                ? "bg-destructive/15 text-destructive"
+                : latestAutoRun
+                  ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+                  : "bg-muted text-muted-foreground"
+            )}
+          >
+            {latestAutoRun
+              ? `${latestAutoRun.status} · ${new Date(
+                  latestAutoRun.startedAt
+                ).toLocaleString()}`
+              : "Waiting for first worker cycle"}
+          </span>
+        </div>
+        {latestAutoRun?.message ? (
+          <p className="mt-3 rounded-lg bg-muted/40 px-3 py-2 font-mono text-xs text-muted-foreground">
+            {latestAutoRun.message}
+          </p>
+        ) : null}
       </section>
 
       <section>
@@ -249,7 +285,10 @@ export default function AdminSyncPage() {
                     <td className="px-3 py-2 text-muted-foreground">
                       {new Date(run.startedAt).toLocaleString()}
                     </td>
-                    <td className="max-w-xs truncate px-3 py-2 text-muted-foreground">
+                    <td
+                      className="max-w-md px-3 py-2 text-xs text-muted-foreground"
+                      title={run.message ?? undefined}
+                    >
                       {run.message}
                     </td>
                   </tr>
