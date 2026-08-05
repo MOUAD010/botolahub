@@ -7,9 +7,10 @@ import { BrandLogo } from "./BrandLogo";
 import { SiteSearch } from "./SiteSearch";
 
 const navItems = [
-  { href: "/" as const, key: "home" },
-  { href: "/botola-pro" as const, key: "botolaPro" },
-  { href: "/news" as const, key: "news" },
+  { href: "/" as const, labelKey: "home" as const },
+  { href: "/botola-pro" as const, labelKey: "botolaPro" as const },
+  { href: "/botola-2" as const, labelKey: "botola2" as const },
+  { href: "/news" as const, labelKey: "news" as const },
 ];
 
 export function Header() {
@@ -36,11 +37,11 @@ export function Header() {
           >
             {navItems.map((item) => (
               <Link
-                key={item.key}
+                key={item.labelKey}
                 href={item.href}
                 className="cursor-pointer rounded-md px-3 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
               >
-                {t(item.key)}
+                {t(item.labelKey)}
               </Link>
             ))}
           </nav>

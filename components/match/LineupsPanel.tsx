@@ -13,13 +13,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-
-function ratingTone(rating: number) {
-  if (rating >= 7.5) return "bg-success text-success-foreground";
-  if (rating >= 7) return "bg-emerald-600 text-white";
-  if (rating >= 6.5) return "bg-amber-500 text-black";
-  return "bg-muted text-muted-foreground";
-}
+import { displaySeasonRating, ratingTone } from "@/lib/rating";
 
 export function LineupsPanel({
   match,
@@ -183,7 +177,9 @@ function PlayerStatsTable({
           <tbody>
             {players.map((player) => {
               const stats = statsById[player.id];
-              const rating = stats?.averageRating;
+              const rating = displaySeasonRating(
+                stats ?? { goals: 0, assists: 0 }
+              );
               return (
                 <tr
                   key={player.id}
@@ -201,29 +197,28 @@ function PlayerStatsTable({
                         src={player.photoUrl}
                         alt={player.name}
                         size={28}
+                        unoptimized={Boolean(
+                          player.photoUrl?.startsWith("/media/")
+                        )}
                       />
                       <span className="truncate">{player.name}</span>
                     </Link>
                   </td>
                   <td className="px-2 py-2.5 text-center">
-                    {rating != null ? (
-                      <span
-                        className={cn(
-                          "inline-block rounded px-1.5 py-0.5 text-xs font-bold tabular-nums",
-                          ratingTone(rating)
-                        )}
-                      >
-                        {rating.toFixed(1)}
-                      </span>
-                    ) : (
-                      "—"
-                    )}
+                    <span
+                      className={cn(
+                        "inline-block rounded px-1.5 py-0.5 text-xs font-bold tabular-nums",
+                        ratingTone(rating)
+                      )}
+                    >
+                      {rating.toFixed(1)}
+                    </span>
                   </td>
                   <td className="px-2 py-2.5 text-center tabular-nums">
-                    {stats?.goals ?? "—"}
+                    {stats?.goals ?? 0}
                   </td>
                   <td className="px-4 py-2.5 text-center tabular-nums">
-                    {stats?.assists ?? "—"}
+                    {stats?.assists ?? 0}
                   </td>
                 </tr>
               );

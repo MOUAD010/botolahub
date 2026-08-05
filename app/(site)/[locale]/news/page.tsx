@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { type Locale } from "@/lib/i18n/routing";
 import { Link } from "@/lib/i18n/navigation";
@@ -18,14 +19,18 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "news" });
+  const title = t("title");
+  const description = t("description");
 
   return {
-    title: t("title"),
-    description: t("description"),
+    title,
+    description,
     alternates: {
       canonical: buildCanonical(locale, "/news"),
       languages: buildLanguageAlternates("/news"),
     },
+    openGraph: { title, description },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
@@ -78,10 +83,11 @@ export default async function NewsPage({
                 className="group flex cursor-pointer flex-col overflow-hidden rounded-xl border border-border bg-card transition-colors hover:border-primary/30 hover:bg-muted/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex-row"
               >
                 {post.coverUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={post.coverUrl}
-                    alt=""
+                    alt={post.title[loc]}
+                    width={192}
+                    height={144}
                     className="h-36 w-full shrink-0 object-cover sm:h-auto sm:w-48"
                   />
                 ) : (

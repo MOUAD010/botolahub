@@ -1,48 +1,92 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 import { computeTotwTokens } from "@/lib/formation";
 import type { Lineup, PlayerSeasonStats } from "@/lib/types";
 import { PlayerAvatar } from "@/components/player/PlayerAvatar";
+import { ratingTone } from "@/lib/rating";
 import { cn } from "@/lib/utils";
+
+export type TotwPayload = {
+  lineup: Lineup;
+  weekLabel: string;
+  statsById: Record<string, PlayerSeasonStats | null>;
+};
 
 function lastName(fullName: string): string {
   const parts = fullName.split(" ");
   return parts.length > 1 ? parts[parts.length - 1]! : fullName;
 }
 
-function ratingTone(rating: number) {
-  if (rating >= 7.5) return "bg-success text-success-foreground";
-  if (rating >= 7) return "bg-emerald-600 text-white";
-  if (rating >= 6.5) return "bg-amber-500 text-black";
-  return "bg-muted text-muted-foreground";
-}
-
 export function TeamOfTheWeek({
-  lineup,
-  weekLabel,
-  statsById,
+  pro,
+  botola2,
 }: {
-  lineup: Lineup;
-  weekLabel: string;
-  statsById: Record<string, PlayerSeasonStats | null>;
+  pro: TotwPayload | null;
+  botola2: TotwPayload | null;
 }) {
   const t = useTranslations("home");
-  const tokens = computeTotwTokens(lineup);
+  const tNav = useTranslations("nav");
+  const [league, setLeague] = useState<"pro" | "b2">(pro ? "pro" : "b2");
+
+  const active = league === "b2" ? botola2 ?? pro : pro ?? botola2;
+  if (!active) return null;
+
+  const tokens = computeTotwTokens(active.lineup);
+  const showSwitcher = Boolean(pro && botola2);
 
   return (
     <section className="flex flex-col overflow-hidden rounded-xl border border-border bg-card">
-      <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
-        <div>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
+        <div className="min-w-0">
           <h2 className="text-base font-semibold text-foreground sm:text-lg">
             {t("teamOfTheWeek")}
           </h2>
-          <p className="text-sm text-muted-foreground">{weekLabel}</p>
+          <p className="text-sm text-muted-foreground">{active.weekLabel}</p>
         </div>
-        <span className="rounded-md bg-muted px-2.5 py-1 text-sm font-medium tabular-nums text-foreground">
-          {lineup.formation}
-        </span>
+        <div className="flex items-center gap-2">
+          {showSwitcher ? (
+            <div
+              className="inline-flex rounded-lg border border-border bg-muted/50 p-0.5"
+              role="tablist"
+              aria-label={t("totwLeagueSwitcher")}
+            >
+              <button
+                type="button"
+                role="tab"
+                aria-selected={league === "pro"}
+                onClick={() => setLeague("pro")}
+                className={cn(
+                  "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                  league === "pro"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {tNav("botolaPro")}
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={league === "b2"}
+                onClick={() => setLeague("b2")}
+                className={cn(
+                  "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                  league === "b2"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {tNav("botola2")}
+              </button>
+            </div>
+          ) : null}
+          <span className="rounded-md bg-muted px-2.5 py-1 text-sm font-medium tabular-nums text-foreground">
+            {active.lineup.formation}
+          </span>
+        </div>
       </div>
 
       <div
@@ -54,11 +98,14 @@ export function TeamOfTheWeek({
       >
         <TotwPitchMarkings />
         {tokens.map((token) => {
-          const stats = statsById[token.player.id];
-          const rating = stats?.averageRating ?? 6.5;
+          const stats = active.statsById[token.player.id];
+          const rating =
+            stats?.averageRating && stats.averageRating > 0
+              ? stats.averageRating
+              : 6.5;
           return (
             <Link
-              key={token.player.id}
+              key={`${league}-${token.player.id}`}
               href={`/player/${token.player.slug}`}
               style={{
                 left: `${token.portrait.x}%`,
@@ -72,6 +119,7 @@ export function TeamOfTheWeek({
                   alt={token.player.name}
                   size={52}
                   className="ring-2 ring-white/40"
+                  unoptimized={Boolean(token.player.photoUrl?.startsWith("/media/"))}
                 />
                 <span
                   className={cn(

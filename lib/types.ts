@@ -59,6 +59,30 @@ export interface MatchStats {
   away: TeamMatchStats;
 }
 
+export interface MatchGoalEvent {
+  minute: number;
+  extraMinute?: number;
+  playerName: string;
+  playerApiId: number;
+  teamApiId: number;
+  /** Which side the goal is credited to on the scoreboard */
+  side: "home" | "away";
+  detail: string;
+}
+
+export type MatchEventKind = "goal" | "yellow" | "red" | "subst" | "var";
+
+export interface MatchTimelineEvent {
+  minute: number;
+  extraMinute?: number;
+  kind: MatchEventKind;
+  side: "home" | "away";
+  detail: string;
+  playerName: string;
+  /** Second player (assist / player on for subst) */
+  secondaryName?: string;
+}
+
 export type StandingZone = "continental" | "relegation" | null;
 
 export interface Standing {
@@ -86,6 +110,7 @@ export interface Player {
   teamId: string;
   nationality?: string;
   dateOfBirth?: string;
+  age?: number;
   /** Optional headshot URL; missing → PlayerAvatar placeholder */
   photoUrl?: string;
   preferredFoot?: "left" | "right" | "both";
@@ -101,6 +126,7 @@ export interface Lineup {
   matchId: string;
   teamId: string;
   formation: string;
+  coachName?: string;
   startingXI: Player[];
   substitutes: Player[];
 }

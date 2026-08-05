@@ -2,6 +2,7 @@
   "nav": {
     "home": "Accueil",
     "botolaPro": "Botola Pro",
+    "botola2": "Botola 2",
     "standings": "Classement",
     "fixtures": "Calendrier",
     "topScorers": "Meilleurs buteurs",
@@ -33,7 +34,8 @@
     "standingsHeading": "Classement",
     "viewFullStandings": "Classement complet",
     "noMatches": "Aucun match dans cette catégorie.",
-    "teamOfTheWeek": "Équipe de la semaine"
+    "teamOfTheWeek": "Équipe de la semaine",
+    "totwLeagueSwitcher": "Ligue de l'équipe de la semaine"
   },
   "match": {
     "overview": "Aperçu",
@@ -55,8 +57,23 @@
     "noPreviousMeetings": "Aucune confrontation précédente disponible.",
     "leaguePosition": "Position au classement",
     "noLineups": "Compositions pas encore disponibles.",
-    "noStats": "Statistiques pas encore disponibles.",
-    "noMedia": "Temps forts bientôt disponibles."
+    "noStats": "Les statistiques détaillées ne sont pas disponibles pour cette rencontre.",
+    "noMedia": "Temps forts bientôt disponibles.",
+    "matchInfo": "Infos match",
+    "kickoff": "Coup d'envoi",
+    "timeline": "Chronologie",
+    "noEvents": "Aucun événement disponible pour le moment.",
+    "teamComparison": "Comparaison",
+    "formations": "Systèmes",
+    "coach": "Entraîneur",
+    "recentForm": "Derniers résultats",
+    "previousMeetings": "Confrontations précédentes",
+    "eventGoal": "But",
+    "eventPenalty": "Penalty",
+    "eventOwnGoal": "CSC",
+    "eventYellow": "Carton jaune",
+    "eventRed": "Carton rouge",
+    "eventSubst": "Remplacement"
   },
   "standings": {
     "position": "#",
@@ -116,7 +133,18 @@
       "DF": "Défenseur",
       "MF": "Milieu",
       "FW": "Attaquant"
-    }
+    },
+    "seasonLabel": "2024/25",
+    "seasonOverview": "Aperçu de la saison",
+    "attacking": "Attaque",
+    "discipline": "Discipline",
+    "perMatch": "Par match",
+    "contributions": "B+P",
+    "goalsPerMatch": "Buts / match",
+    "assistsPerMatch": "Passes / match",
+    "cardsTotal": "Cartons",
+    "noData": "Aucune donnée disponible pour le moment.",
+    "careerSoon": "L’historique complet nécessite les saisons passées. Les stats de saison sont dans l’onglet Saison."
   },
   "news": {
     "title": "Actualités — KooraLive",
@@ -132,9 +160,9 @@
     "metaDescription": "Classement en direct, calendrier, statistiques joueurs et infos de la Botola Pro.",
     "name": "Botola Pro",
     "country": "Maroc",
-    "season": "2025/26",
-    "seasonStart": "Août 2025",
-    "seasonEnd": "Mai 2026",
+    "season": "2024/25",
+    "seasonStart": "Août 2024",
+    "seasonEnd": "Mai 2025",
     "favourite": "Favori",
     "followers": "Championnat élite du Maroc",
     "matches": "Matchs",
@@ -160,8 +188,42 @@
     "seasonLabel": "Saison",
     "teamsLabel": "Équipes"
   },
+  "competition2": {
+    "metaTitle": "Botola 2 — Classement, calendrier et résultats",
+    "metaDescription": "Classement en direct, calendrier et détails de saison de la Botola 2.",
+    "name": "Botola 2",
+    "country": "Maroc",
+    "season": "2024/25",
+    "seasonStart": "Août 2024",
+    "seasonEnd": "Mai 2025",
+    "favourite": "Favori",
+    "followers": "Deuxième division marocaine",
+    "matches": "Matchs",
+    "byRound": "Par journée",
+    "byDate": "Par date",
+    "featured": "À la une",
+    "tabStandings": "Classement",
+    "tabStats": "Stats",
+    "tabDetails": "Détails",
+    "tabMedia": "Médias",
+    "filterAll": "Tous",
+    "filterHome": "Domicile",
+    "filterAway": "Extérieur",
+    "playerStats": "Stats joueurs",
+    "statGeneral": "Général",
+    "statAttack": "Attaque",
+    "statDefense": "Défense",
+    "statPassing": "Passes",
+    "statGoalkeeping": "Gardien",
+    "noMedia": "Médias bientôt disponibles.",
+    "detailsBody": "La Botola 2 est la deuxième division du football marocain, avec promotion et relégation liées à la Botola Pro.",
+    "countryLabel": "Pays",
+    "seasonLabel": "Saison",
+    "teamsLabel": "Équipes"
+  },
   "ads": {
-    "advertisement": "Publicité"
+    "advertisement": "Publicité",
+    "loading": "Chargement de la pub…"
   },
   "footer": {
     "rights": "Tous droits réservés.",

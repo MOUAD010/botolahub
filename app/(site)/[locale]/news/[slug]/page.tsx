@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { type Locale } from "@/lib/i18n/routing";
@@ -8,17 +10,21 @@ import {
   getNewsBySlug,
   incrementNewsViews,
 } from "@/lib/repositories/news";
-import { getPlayerById } from "@/data/players.mock";
-import { getMatchById } from "@/data/matches.mock";
+import { getMatchById, getPlayerById } from "@/lib/repositories";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { buildCanonical, buildLanguageAlternates } from "@/lib/seo/alternates";
 import { SITE_NAME } from "@/lib/seo/site";
+import { buildNewsArticleJsonLd, JsonLd } from "@/lib/seo/jsonld";
 import { sanitizeNewsHtml } from "@/lib/sanitize";
 import { localizeNewsMentions } from "@/lib/mentions";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
+
+// Shared per-request so generateMetadata and the page body don't each fetch
+// the same post separately.
+const getPost = cache((slug: string) => getNewsBySlug(slug));
 
 export async function generateMetadata({
   params,
@@ -26,7 +32,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
   const { locale, slug } = await params;
-  const post = await getNewsBySlug(slug);
+  const post = await getPost(slug);
   if (!post) return {};
 
   const loc = locale as Locale;
@@ -34,7 +40,7 @@ export async function generateMetadata({
     post.metaTitle?.[loc]?.trim() || post.title[loc] || SITE_NAME;
   const description =
     post.metaDescription?.[loc]?.trim() || post.excerpt[loc] || undefined;
-  const og = post.ogImage?.[loc]?.trim();
+  const og = post.ogImage?.[loc]?.trim() || post.coverUrl || undefined;
 
   return {
     title,
@@ -50,6 +56,12 @@ export async function generateMetadata({
       publishedTime: post.publishedAt ?? undefined,
       ...(og ? { images: [{ url: og }] } : {}),
     },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      ...(og ? { images: [og] } : {}),
+    },
   };
 }
 
@@ -61,7 +73,7 @@ export default async function NewsArticlePage({
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  const post = await getNewsBySlug(slug);
+  const post = await getPost(slug);
   if (!post) notFound();
 
   void incrementNewsViews(slug).catch(() => {});
@@ -78,15 +90,26 @@ export default async function NewsArticlePage({
     year: "numeric",
   });
 
-  const players = post.playerIds
-    .map((id) => getPlayerById(id))
-    .filter(Boolean);
-  const matches = post.matchIds
-    .map((id) => getMatchById(id))
-    .filter(Boolean);
+  const players = (
+    await Promise.all(post.playerIds.map((id) => getPlayerById(id)))
+  ).filter(Boolean);
+  const matches = (
+    await Promise.all(post.matchIds.map((id) => getMatchById(id)))
+  ).filter(Boolean);
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-6 sm:px-6 xl:px-8">
+      <JsonLd
+        data={buildNewsArticleJsonLd(
+          {
+            title: post.title[loc],
+            excerpt: post.excerpt[loc],
+            coverUrl: post.coverUrl,
+            publishedAt: post.publishedAt,
+          },
+          `/${locale}/news/${slug}`
+        )}
+      />
       <Breadcrumbs
         locale={locale}
         items={[
@@ -99,11 +122,13 @@ export default async function NewsArticlePage({
       <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
         <article className="min-w-0">
           {post.coverUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={post.coverUrl}
-              alt=""
+              alt={post.title[loc]}
+              width={1200}
+              height={630}
               className="mb-6 h-48 w-full rounded-xl object-cover sm:h-64"
+              priority
             />
           ) : (
             <div

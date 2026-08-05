@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -14,8 +14,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
-import { players } from "@/data/players.mock";
-import { matches } from "@/data/matches.mock";
 import { cn } from "@/lib/utils";
 import { isEmptyHtml } from "@/lib/sanitize";
 import {
@@ -24,6 +22,9 @@ import {
 } from "@/lib/admin/news-form";
 
 export type { NewsFormValues } from "@/lib/admin/news-form";
+
+type TagPlayer = { id: string; name: string };
+type TagMatch = { id: string; label: string };
 
 const locales: NewsFormLocale[] = ["fr", "ar", "en"];
 
@@ -35,33 +36,79 @@ export function NewsEditor({ initial }: { initial: NewsFormValues }) {
   const [tagInput, setTagInput] = useState("");
   const [playerQuery, setPlayerQuery] = useState("");
   const [matchQuery, setMatchQuery] = useState("");
+  const [playerSuggestions, setPlayerSuggestions] = useState<TagPlayer[]>([]);
+  const [matchSuggestions, setMatchSuggestions] = useState<TagMatch[]>([]);
+  const [playerLabels, setPlayerLabels] = useState<Record<string, string>>({});
+  const [matchLabels, setMatchLabels] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [showUrlField, setShowUrlField] = useState(false);
 
-  const playerSuggestions = useMemo(() => {
-    const q = playerQuery.trim().toLowerCase();
-    if (!q) return [];
-    return players
-      .filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) && !form.playerIds.includes(p.id)
-      )
-      .slice(0, 8);
+  useEffect(() => {
+    const q = playerQuery.trim();
+    if (!q) {
+      setPlayerSuggestions([]);
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      void fetch(`/api/admin/mentions?q=${encodeURIComponent(`player ${q}`)}`)
+        .then((res) => (res.ok ? res.json() : { items: [] }))
+        .then((data: { items: Array<{ id: string; label: string }> }) => {
+          if (cancelled) return;
+          setPlayerSuggestions(
+            data.items
+              .filter((p) => !form.playerIds.includes(p.id))
+              .map((p) => ({ id: p.id, name: p.label }))
+              .slice(0, 8)
+          );
+        })
+        .catch(() => {
+          if (!cancelled) setPlayerSuggestions([]);
+        });
+    }, 200);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [playerQuery, form.playerIds]);
 
-  const matchSuggestions = useMemo(() => {
-    const q = matchQuery.trim().toLowerCase();
-    if (!q) return [];
-    return matches
-      .filter((m) => {
-        const label =
-          `${m.homeTeam.name} ${m.awayTeam.name} ${m.slug}`.toLowerCase();
-        return label.includes(q) && !form.matchIds.includes(m.id);
-      })
-      .slice(0, 8);
+  useEffect(() => {
+    const q = matchQuery.trim();
+    if (!q) {
+      setMatchSuggestions([]);
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      void fetch(`/api/admin/mentions?q=${encodeURIComponent(`match ${q}`)}`)
+        .then((res) => (res.ok ? res.json() : { items: [] }))
+        .then(
+          (data: {
+            items: Array<{ id: string; label: string; subtitle?: string }>;
+          }) => {
+            if (cancelled) return;
+            setMatchSuggestions(
+              data.items
+                .filter((m) => !form.matchIds.includes(m.id))
+                .map((m) => ({
+                  id: m.id,
+                  label: m.subtitle || m.label,
+                }))
+                .slice(0, 8)
+            );
+          }
+        )
+        .catch(() => {
+          if (!cancelled) setMatchSuggestions([]);
+        });
+    }, 200);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [matchQuery, form.matchIds]);
 
   function updateTranslation(
@@ -188,9 +235,7 @@ export function NewsEditor({ initial }: { initial: NewsFormValues }) {
             <span className="text-xs text-muted-foreground">Optional</span>
           </div>
           <div className="flex flex-wrap gap-2">
-            {form.playerIds.map((id) => {
-              const p = players.find((x) => x.id === id);
-              return (
+            {form.playerIds.map((id) => (
                 <button
                   key={id}
                   type="button"
@@ -202,11 +247,10 @@ export function NewsEditor({ initial }: { initial: NewsFormValues }) {
                   }
                   className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-1 text-xs"
                 >
-                  {p?.name ?? id}
+                  {playerLabels[id] ?? id}
                   <X className="size-3" aria-hidden />
                 </button>
-              );
-            })}
+              ))}
           </div>
           <input
             value={playerQuery}
@@ -226,6 +270,7 @@ export function NewsEditor({ initial }: { initial: NewsFormValues }) {
                         ...form,
                         playerIds: [...form.playerIds, p.id],
                       });
+                      setPlayerLabels((prev) => ({ ...prev, [p.id]: p.name }));
                       setPlayerQuery("");
                     }}
                   >
@@ -243,9 +288,7 @@ export function NewsEditor({ initial }: { initial: NewsFormValues }) {
             <span className="text-xs text-muted-foreground">Optional</span>
           </div>
           <div className="flex flex-wrap gap-2">
-            {form.matchIds.map((id) => {
-              const m = matches.find((x) => x.id === id);
-              return (
+            {form.matchIds.map((id) => (
                 <button
                   key={id}
                   type="button"
@@ -257,13 +300,10 @@ export function NewsEditor({ initial }: { initial: NewsFormValues }) {
                   }
                   className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-1 text-xs"
                 >
-                  {m
-                    ? `${m.homeTeam.shortName} vs ${m.awayTeam.shortName}`
-                    : id}
+                  {matchLabels[id] ?? id}
                   <X className="size-3" aria-hidden />
                 </button>
-              );
-            })}
+              ))}
           </div>
           <input
             value={matchQuery}
@@ -283,10 +323,11 @@ export function NewsEditor({ initial }: { initial: NewsFormValues }) {
                         ...form,
                         matchIds: [...form.matchIds, m.id],
                       });
+                      setMatchLabels((prev) => ({ ...prev, [m.id]: m.label }));
                       setMatchQuery("");
                     }}
                   >
-                    {m.homeTeam.name} vs {m.awayTeam.name}
+                    {m.label}
                   </button>
                 </li>
               ))}

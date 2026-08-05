@@ -12,9 +12,11 @@ import { routing, type Locale } from "@/lib/i18n/routing";
 import { getDirection } from "@/lib/i18n/locales";
 import { SITE_NAME, SITE_URL } from "@/lib/seo/site";
 import { buildLanguageAlternates } from "@/lib/seo/alternates";
-import { matchRepository } from "@/lib/repositories";
-import { BOTOLA_PRO } from "@/data/matches.mock";
+import {
+  getHomeFixtures,
+} from "@/lib/repositories";
 import { PageviewTracker } from "@/components/analytics/PageviewTracker";
+import { AdNetworkScript } from "@/components/ads/AdNetworkScript";
 import "../../globals.css";
 
 const geistSans = Geist({
@@ -95,7 +97,7 @@ export default async function LocaleLayout({
     dir === "rtl" ? "var(--font-arabic)" : "var(--font-geist-sans)";
   const arabicFontClass = dir === "rtl" ? notoSansArabic.variable : "";
 
-  const weekMatches = await matchRepository.getByCompetition(BOTOLA_PRO.id);
+  const weekMatches = await getHomeFixtures(7);
 
   return (
     <html
@@ -129,6 +131,7 @@ export default async function LocaleLayout({
                   {children}
                 </main>
                 <PageviewTracker />
+                <AdNetworkScript />
               </TooltipProvider>
             </ThemeProvider>
           </DirectionProvider>

@@ -228,6 +228,50 @@ export function TeamPageTabs({
                 </div>
               ))}
             </div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                {
+                  label: "Win %",
+                  value:
+                    standing.played > 0
+                      ? `${Math.round((standing.won / standing.played) * 100)}%`
+                      : "—",
+                },
+                {
+                  label: "PPG",
+                  value:
+                    standing.played > 0
+                      ? (standing.points / standing.played).toFixed(2)
+                      : "—",
+                },
+                {
+                  label: "GF/game",
+                  value:
+                    standing.played > 0
+                      ? (standing.goalsFor / standing.played).toFixed(2)
+                      : "—",
+                },
+                {
+                  label: "GA/game",
+                  value:
+                    standing.played > 0
+                      ? (standing.goalsAgainst / standing.played).toFixed(2)
+                      : "—",
+                },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-xl border border-border bg-card p-4 text-center"
+                >
+                  <div className="text-2xl font-bold tabular-nums text-foreground">
+                    {item.value}
+                  </div>
+                  <div className="mt-1 text-sm text-muted-foreground">
+                    {item.label}
+                  </div>
+                </div>
+              ))}
+            </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <StatRow
                 label={labels.goalsFor}
@@ -253,11 +297,34 @@ export function TeamPageTabs({
                   {standing.points}
                 </span>
               </div>
+              <div className="mt-2 text-sm text-muted-foreground">
+                League position #{standing.position}
+              </div>
               <div className="mt-4">
                 <p className="mb-2 text-sm text-muted-foreground">
                   {labels.recentForm}
                 </p>
                 <FormBadges form={standing.form} label={labels.form} />
+              </div>
+            </div>
+            <div className="rounded-xl border border-border bg-card p-4">
+              <p className="mb-3 text-sm font-medium text-foreground">
+                Squad size
+              </p>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {squadByPosition.map((g) => (
+                  <div
+                    key={g.position}
+                    className="rounded-lg bg-muted/40 px-3 py-2 text-center"
+                  >
+                    <div className="text-lg font-bold tabular-nums">
+                      {g.players.length}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {labels.positionLabels[g.position]}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </>

@@ -2,13 +2,12 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/lib/i18n/routing";
 import {
+  getTeamOfTheWeekFromDb,
   matchRepository,
   playerRepository,
   standingsRepository,
 } from "@/lib/repositories";
-import { BOTOLA_PRO } from "@/data/matches.mock";
-import { teamOfTheWeek, totwWeekLabel } from "@/data/totw.mock";
-import type { PlayerSeasonStats } from "@/lib/types";
+import { BOTOLA_PRO } from "@/lib/api-football/constants";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CompetitionHeader } from "@/components/competition/CompetitionHeader";
@@ -29,14 +28,18 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "competition" });
+  const title = t("metaTitle");
+  const description = t("metaDescription");
 
   return {
-    title: t("metaTitle"),
-    description: t("metaDescription"),
+    title,
+    description,
     alternates: {
       canonical: buildCanonical(locale, "/botola-pro"),
       languages: buildLanguageAlternates("/botola-pro"),
     },
+    openGraph: { title, description },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
@@ -48,26 +51,18 @@ export default async function BotolaProPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [matches, standings, topScorers, t, tNav, tCommon, tStandings, tPlayer] =
+  const [matches, standings, topScorers, totw, t, tNav, tCommon, tStandings, tPlayer] =
     await Promise.all([
       matchRepository.getByCompetition(BOTOLA_PRO.id),
       standingsRepository.getStandings(BOTOLA_PRO.id),
       playerRepository.getTopScorers(25),
+      getTeamOfTheWeekFromDb(BOTOLA_PRO.id),
       getTranslations({ locale, namespace: "competition" }),
       getTranslations({ locale, namespace: "nav" }),
       getTranslations({ locale, namespace: "common" }),
       getTranslations({ locale, namespace: "standings" }),
       getTranslations({ locale, namespace: "player" }),
     ]);
-
-  const totwStatsEntries = await Promise.all(
-    teamOfTheWeek.startingXI.map(
-      async (p) =>
-        [p.id, await playerRepository.getSeasonStats(p.id)] as const
-    )
-  );
-  const totwStatsById: Record<string, PlayerSeasonStats | null> =
-    Object.fromEntries(totwStatsEntries);
 
   return (
     <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col gap-5 px-4 py-5 sm:px-6 xl:px-8">
@@ -110,9 +105,7 @@ export default async function BotolaProPage({
           <CompetitionMainTabs
             standings={standings}
             topScorers={topScorers}
-            totw={teamOfTheWeek}
-            totwWeekLabel={totwWeekLabel}
-            totwStatsById={totwStatsById}
+            totw={totw}
             labels={{
               standings: t("tabStandings"),
               stats: t("tabStats"),

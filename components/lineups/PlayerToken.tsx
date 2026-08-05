@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 import { cn } from "@/lib/utils";
+import { displaySeasonRating, ratingTone } from "@/lib/rating";
 import type { PitchToken } from "@/lib/formation";
 import type { PlayerSeasonStats } from "@/lib/types";
 import { PlayerAvatar } from "@/components/player/PlayerAvatar";
@@ -17,13 +18,6 @@ function lastName(fullName: string): string {
   return rest.length > 0 ? rest.join(" ") : first;
 }
 
-function ratingTone(rating: number) {
-  if (rating >= 7.5) return "bg-success text-success-foreground";
-  if (rating >= 7) return "bg-emerald-600 text-white";
-  if (rating >= 6.5) return "bg-amber-500 text-black";
-  return "bg-muted text-muted-foreground";
-}
-
 export function PlayerToken({
   token,
   team,
@@ -36,7 +30,9 @@ export function PlayerToken({
   const t = useTranslations("player");
   const tCommon = useTranslations("common");
   const { player } = token;
-  const rating = seasonStats?.averageRating;
+  const rating = seasonStats
+    ? displaySeasonRating(seasonStats)
+    : displaySeasonRating({ goals: 0, assists: 0 });
 
   return (
     <Popover>
@@ -62,21 +58,20 @@ export function PlayerToken({
             src={player.photoUrl}
             alt={player.name}
             size={40}
+            unoptimized={Boolean(player.photoUrl?.startsWith("/media/"))}
             className={cn(
               "ring-2",
               team === "home" ? "ring-primary" : "ring-foreground"
             )}
           />
-          {rating != null && (
-            <span
-              className={cn(
-                "absolute -end-1 -top-1 rounded px-1 text-[10px] font-bold tabular-nums",
-                ratingTone(rating)
-              )}
-            >
-              {rating.toFixed(1)}
-            </span>
-          )}
+          <span
+            className={cn(
+              "absolute -end-1 -top-1 rounded px-1 text-[10px] font-bold tabular-nums",
+              ratingTone(rating)
+            )}
+          >
+            {rating.toFixed(1)}
+          </span>
         </span>
         <span className="max-w-18 truncate rounded bg-background/85 px-1 text-[11px] font-medium text-foreground shadow-sm sm:max-w-22 sm:text-xs">
           {player.shirtNumber} {lastName(player.name)}
@@ -99,34 +94,39 @@ export function PlayerToken({
             <p className="text-sm text-muted-foreground">{player.position}</p>
           </div>
         </div>
-        {seasonStats && (
-          <dl className="mt-3 grid grid-cols-3 gap-2 border-t border-border pt-3 text-center">
-            <div>
-              <dt className="text-xs uppercase text-muted-foreground">
-                {t("rating")}
-              </dt>
-              <dd className="text-base font-bold text-foreground">
-                {seasonStats.averageRating.toFixed(1)}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs uppercase text-muted-foreground">
-                {tCommon("goals")}
-              </dt>
-              <dd className="text-base font-bold text-foreground">
-                {seasonStats.goals}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs uppercase text-muted-foreground">
-                {t("assists")}
-              </dt>
-              <dd className="text-base font-bold text-foreground">
-                {seasonStats.assists}
-              </dd>
-            </div>
-          </dl>
-        )}
+        {(() => {
+          const popRating = seasonStats
+            ? displaySeasonRating(seasonStats)
+            : displaySeasonRating({ goals: 0, assists: 0 });
+          return (
+            <dl className="mt-3 grid grid-cols-3 gap-2 border-t border-border pt-3 text-center">
+              <div>
+                <dt className="text-xs uppercase text-muted-foreground">
+                  {t("rating")}
+                </dt>
+                <dd className="text-base font-bold text-foreground">
+                  {popRating.toFixed(1)}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs uppercase text-muted-foreground">
+                  {tCommon("goals")}
+                </dt>
+                <dd className="text-base font-bold text-foreground">
+                  {seasonStats?.goals ?? 0}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs uppercase text-muted-foreground">
+                  {t("assists")}
+                </dt>
+                <dd className="text-base font-bold text-foreground">
+                  {seasonStats?.assists ?? 0}
+                </dd>
+              </div>
+            </dl>
+          );
+        })()}
       </PopoverContent>
     </Popover>
   );

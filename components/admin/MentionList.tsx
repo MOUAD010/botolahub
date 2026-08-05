@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import {
   isHintMention,
   type MentionItem,
-} from "@/lib/mentions";
+} from "@/lib/mentions-shared";
 
 export type MentionListRef = {
   onKeyDown: (props: { event: KeyboardEvent }) => boolean;

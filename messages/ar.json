@@ -2,6 +2,7 @@
   "nav": {
     "home": "الرئيسية",
     "botolaPro": "البطولة الاحترافية",
+    "botola2": "البطولة 2",
     "standings": "الترتيب",
     "fixtures": "المباريات",
     "topScorers": "الهدافون",
@@ -33,7 +34,8 @@
     "standingsHeading": "الترتيب",
     "viewFullStandings": "الترتيب الكامل",
     "noMatches": "لا توجد مباريات في هذه الفئة.",
-    "teamOfTheWeek": "تشكيلة الأسبوع"
+    "teamOfTheWeek": "تشكيلة الأسبوع",
+    "totwLeagueSwitcher": "دوري تشكيلة الأسبوع"
   },
   "match": {
     "overview": "نظرة عامة",
@@ -55,8 +57,23 @@
     "noPreviousMeetings": "لا توجد مواجهات سابقة متاحة.",
     "leaguePosition": "المركز في الترتيب",
     "noLineups": "التشكيلة غير متوفرة بعد.",
-    "noStats": "الإحصائيات غير متوفرة بعد.",
-    "noMedia": "أبرز اللحظات قريباً."
+    "noStats": "الإحصائيات التفصيلية غير متوفرة لهذه المباراة.",
+    "noMedia": "أبرز اللحظات قريباً.",
+    "matchInfo": "معلومات المباراة",
+    "kickoff": "انطلاق المباراة",
+    "timeline": "أحداث المباراة",
+    "noEvents": "لا توجد أحداث متاحة بعد.",
+    "teamComparison": "مقارنة الفريقين",
+    "formations": "التشكيلات",
+    "coach": "المدرب",
+    "recentForm": "النتائج الأخيرة",
+    "previousMeetings": "المواجهات السابقة",
+    "eventGoal": "هدف",
+    "eventPenalty": "ركلة جزاء",
+    "eventOwnGoal": "هدف عكسي",
+    "eventYellow": "بطاقة صفراء",
+    "eventRed": "بطاقة حمراء",
+    "eventSubst": "تبديل"
   },
   "standings": {
     "position": "#",
@@ -116,7 +133,18 @@
       "DF": "مدافع",
       "MF": "وسط",
       "FW": "مهاجم"
-    }
+    },
+    "seasonLabel": "2024/25",
+    "seasonOverview": "نظرة عامة على الموسم",
+    "attacking": "الهجوم",
+    "discipline": "الانضباط",
+    "perMatch": "لكل مباراة",
+    "contributions": "أ+ص",
+    "goalsPerMatch": "أهداف / مباراة",
+    "assistsPerMatch": "تمريرات / مباراة",
+    "cardsTotal": "البطاقات",
+    "noData": "لا توجد بيانات متاحة بعد.",
+    "careerSoon": "السيرة الكاملة تحتاج بيانات المواسم السابقة. إحصائيات الموسم في تبويب الموسم."
   },
   "news": {
     "title": "الأخبار — KooraLive",
@@ -132,9 +160,9 @@
     "metaDescription": "ترتيب مباشر ومباريات وإحصائيات اللاعبين وتفاصيل البطولة الاحترافية المغربية.",
     "name": "البطولة الاحترافية",
     "country": "المغرب",
-    "season": "2025/26",
-    "seasonStart": "أغسطس 2025",
-    "seasonEnd": "مايو 2026",
+    "season": "2024/25",
+    "seasonStart": "أغسطس 2024",
+    "seasonEnd": "مايو 2025",
     "favourite": "المفضلة",
     "followers": "الدوري المغربي الأول",
     "matches": "المباريات",
@@ -160,8 +188,42 @@
     "seasonLabel": "الموسم",
     "teamsLabel": "الأندية"
   },
+  "competition2": {
+    "metaTitle": "البطولة 2 — الترتيب والمباريات",
+    "metaDescription": "ترتيب البطولة 2 والمباريات وتفاصيل الموسم.",
+    "name": "البطولة 2",
+    "country": "المغرب",
+    "season": "2024/25",
+    "seasonStart": "أغسطس 2024",
+    "seasonEnd": "مايو 2025",
+    "favourite": "مفضلة",
+    "followers": "القسم الثاني المغربي",
+    "matches": "المباريات",
+    "byRound": "حسب الجولة",
+    "byDate": "حسب التاريخ",
+    "featured": "مميزة",
+    "tabStandings": "الترتيب",
+    "tabStats": "إحصائيات",
+    "tabDetails": "تفاصيل",
+    "tabMedia": "وسائط",
+    "filterAll": "الكل",
+    "filterHome": "داخل الديار",
+    "filterAway": "خارج الديار",
+    "playerStats": "إحصائيات اللاعبين",
+    "statGeneral": "عام",
+    "statAttack": "هجوم",
+    "statDefense": "دفاع",
+    "statPassing": "تمرير",
+    "statGoalkeeping": "حراسة",
+    "noMedia": "الوسائط قريباً.",
+    "detailsBody": "البطولة 2 هي الدرجة الثانية في كرة القدم المغربية، مع الصعود والهبوط المرتبطين بالبطولة الاحترافية.",
+    "countryLabel": "البلد",
+    "seasonLabel": "الموسم",
+    "teamsLabel": "الأندية"
+  },
   "ads": {
-    "advertisement": "إعلان"
+    "advertisement": "إعلان",
+    "loading": "جاري تحميل الإعلان…"
   },
   "footer": {
     "rights": "جميع الحقوق محفوظة.",

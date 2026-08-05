@@ -1,33 +1,31 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/lib/i18n/navigation";
-import { routing, type Locale } from "@/lib/i18n/routing";
+import { type Locale } from "@/lib/i18n/routing";
 import { toIntlLocale } from "@/lib/i18n/format";
 import { playerRepository, teamRepository } from "@/lib/repositories";
-import { lineups } from "@/data/lineups.mock";
 import type { PlayerMatchRating, PlayerSeasonStats } from "@/lib/types";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { PlayerAvatar } from "@/components/player/PlayerAvatar";
 import { PlayerProfileTabs } from "@/components/player/PlayerProfileTabs";
 import { buildCanonical, buildLanguageAlternates } from "@/lib/seo/alternates";
+import { buildPersonJsonLd, JsonLd } from "@/lib/seo/jsonld";
 import { cn } from "@/lib/utils";
+import { ratingToneSoft } from "@/lib/rating";
 
 export const revalidate = 300;
 
 export function generateStaticParams() {
-  const slugs = new Set<string>();
-  lineups.forEach((lineup) => {
-    lineup.startingXI.forEach((p) => slugs.add(p.slug));
-    lineup.substitutes.forEach((p) => slugs.add(p.slug));
-  });
-
-  return routing.locales.flatMap((locale) =>
-    Array.from(slugs).map((slug) => ({ locale, slug }))
-  );
+  return [];
 }
+
+// Shared per-request so generateMetadata and the page body don't each fetch
+// the same player separately.
+const getPlayer = cache((slug: string) => playerRepository.getBySlug(slug));
 
 export async function generateMetadata({
   params,
@@ -35,19 +33,29 @@ export async function generateMetadata({
   params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
   const { locale, slug } = await params;
-  const player = await playerRepository.getBySlug(slug);
+  const player = await getPlayer(slug);
   if (!player) return {};
+
+  const description = `${player.name} — profile, season stats and recent ratings.`;
 
   return {
     title: player.name,
-    description: `${player.name} — profile, season stats and recent ratings.`,
+    description,
     alternates: {
       canonical: buildCanonical(locale, `/player/${slug}`),
       languages: buildLanguageAlternates(`/player/${slug}`),
     },
     openGraph: {
       title: player.name,
+      description,
       url: buildCanonical(locale, `/player/${slug}`),
+      ...(player.photoUrl ? { images: [{ url: player.photoUrl }] } : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: player.name,
+      description,
+      ...(player.photoUrl ? { images: [player.photoUrl] } : {}),
     },
   };
 }
@@ -70,7 +78,7 @@ export default async function PlayerPage({
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  const player = await playerRepository.getBySlug(slug);
+  const player = await getPlayer(slug);
   if (!player) notFound();
 
   const [team, seasonStats, recentRatings, t, tMatch, tCommon, tNav] =
@@ -85,13 +93,24 @@ export default async function PlayerPage({
     ]);
 
   const intlLocale = toIntlLocale(locale as Locale);
-  const age = ageFromId(player.id);
+  const age = player.age ?? ageFromId(player.id);
   const height = player.heightCm ?? heightFromId(player.id);
   const nationality = player.nationality ?? "Morocco";
   const foot = player.preferredFoot ?? "right";
+  const rating = seasonStats?.averageRating ?? 0;
 
   return (
     <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col gap-5 px-4 py-5 sm:px-6 xl:px-8">
+      <JsonLd
+        data={buildPersonJsonLd(
+          {
+            name: player.name,
+            nationality: player.nationality,
+            photoUrl: player.photoUrl,
+          },
+          `/${locale}/player/${slug}`
+        )}
+      />
       <Breadcrumbs
         locale={locale}
         items={[
@@ -102,81 +121,106 @@ export default async function PlayerPage({
         ]}
       />
 
-      <header className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:gap-6 sm:p-5">
-        <PlayerAvatar
-          src={player.photoUrl}
-          alt={player.name}
-          size={96}
-          className="mx-auto sm:mx-0"
-        />
-
-        <div className="min-w-0 flex-1 text-center sm:text-start">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            {player.name}
-          </h1>
-          {team && (
-            <Link
-              href={`/team/${team.slug}`}
-              className="mt-1 inline-flex cursor-pointer items-center gap-2 text-base text-muted-foreground hover:text-foreground"
-            >
-              <Image
-                src={team.badgeUrl}
-                alt={team.name}
-                width={22}
-                height={22}
-                className="size-[22px]"
-              />
-              {team.name}
-            </Link>
-          )}
-
-          <dl className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-muted-foreground sm:justify-start">
-            <div className="flex items-center gap-1.5">
-              <dt className="sr-only">{t("nationality")}</dt>
-              <dd>{nationality}</dd>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <dt className="sr-only">{t("age")}</dt>
-              <dd>
-                {age} {t("years")}
-              </dd>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <dt className="sr-only">{t("position")}</dt>
-              <dd>{t(`positions.${player.position}`)}</dd>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <dt className="sr-only">{t("height")}</dt>
-              <dd>{height} cm</dd>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <dt className="sr-only">{t("preferredFoot")}</dt>
-              <dd>{t(`foot.${foot}`)}</dd>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <dt className="sr-only">{t("shirtNumber")}</dt>
-              <dd>#{player.shirtNumber}</dd>
-            </div>
-          </dl>
-        </div>
-
-        {seasonStats && (
-          <div className="flex shrink-0 flex-col items-center gap-1 rounded-lg bg-muted/60 px-5 py-3">
-            <span className="text-xs uppercase text-muted-foreground">
-              {t("rating")}
-            </span>
-            <span
-              className={cn(
-                "rounded-md px-2.5 py-1 text-2xl font-bold tabular-nums",
-                seasonStats.averageRating >= 7
-                  ? "bg-success/20 text-success"
-                  : "bg-background text-foreground"
-              )}
-            >
-              {seasonStats.averageRating.toFixed(1)}
-            </span>
+      <header className="relative overflow-hidden rounded-xl border border-border bg-card p-4 sm:p-5">
+        {team && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -end-6 -top-8 size-40 opacity-[0.07] sm:size-52"
+          >
+            <Image
+              src={team.badgeUrl}
+              alt=""
+              fill
+              className="object-contain"
+              unoptimized={team.badgeUrl.startsWith("/media/")}
+            />
           </div>
         )}
+
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+          <div className="relative mx-auto shrink-0 sm:mx-0">
+            <PlayerAvatar
+              src={player.photoUrl}
+              alt={player.name}
+              size={104}
+              unoptimized={Boolean(player.photoUrl?.startsWith("/media/"))}
+              className="ring-2 ring-border"
+            />
+            {team && (
+              <Link
+                href={`/team/${team.slug}`}
+                className="absolute -end-1 -bottom-1 flex size-11 items-center justify-center rounded-full border-2 border-card bg-card shadow-md transition-transform hover:scale-105"
+                title={team.name}
+              >
+                <Image
+                  src={team.badgeUrl}
+                  alt={team.name}
+                  width={32}
+                  height={32}
+                  className="size-8"
+                  unoptimized={team.badgeUrl.startsWith("/media/")}
+                />
+              </Link>
+            )}
+            {player.shirtNumber > 0 && (
+              <span className="absolute -start-1 -top-1 flex size-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground shadow-md">
+                {player.shirtNumber}
+              </span>
+            )}
+          </div>
+
+          <div className="min-w-0 flex-1 text-center sm:text-start">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              {player.name}
+            </h1>
+            {team && (
+              <Link
+                href={`/team/${team.slug}`}
+                className="mt-2 inline-flex cursor-pointer items-center gap-2.5 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+              >
+                <Image
+                  src={team.badgeUrl}
+                  alt={team.name}
+                  width={28}
+                  height={28}
+                  className="size-7"
+                  unoptimized={team.badgeUrl.startsWith("/media/")}
+                />
+                {team.name}
+              </Link>
+            )}
+
+            <dl className="mt-4 flex flex-wrap items-center justify-center gap-2 text-sm sm:justify-start">
+              <MetaChip label={t("nationality")} value={nationality} />
+              <MetaChip
+                label={t("age")}
+                value={`${age} ${t("years")}`}
+              />
+              <MetaChip
+                label={t("position")}
+                value={t(`positions.${player.position}`)}
+              />
+              <MetaChip label={t("height")} value={`${height} cm`} />
+              <MetaChip label={t("preferredFoot")} value={t(`foot.${foot}`)} />
+            </dl>
+          </div>
+
+          {seasonStats && rating > 0 && (
+            <div className="flex shrink-0 flex-col items-center gap-1 rounded-xl border border-border bg-muted/40 px-5 py-3">
+              <span className="text-xs uppercase text-muted-foreground">
+                {t("rating")}
+              </span>
+              <span
+                className={cn(
+                  "rounded-md px-2.5 py-1 text-2xl font-bold tabular-nums",
+                  ratingToneSoft(rating)
+                )}
+              >
+                {rating.toFixed(1)}
+              </span>
+            </div>
+          )}
+        </div>
       </header>
 
       <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)_280px]">
@@ -204,6 +248,9 @@ export default async function PlayerPage({
           <PlayerProfileTabs
             ratings={recentRatings}
             seasonStats={seasonStats}
+            team={team}
+            seasonLabel={t("seasonLabel")}
+            competitionName={tNav("botolaPro")}
             locale={locale as Locale}
             labels={{
               matches: t("matchesTab"),
@@ -217,7 +264,16 @@ export default async function PlayerPage({
               yellow: tMatch("yellowCards"),
               red: tMatch("redCards"),
               vs: tCommon("vs"),
-              noData: "—",
+              noData: t("noData"),
+              seasonOverview: t("seasonOverview"),
+              attacking: t("attacking"),
+              discipline: t("discipline"),
+              perMatch: t("perMatch"),
+              contributions: t("contributions"),
+              goalsPerMatch: t("goalsPerMatch"),
+              assistsPerMatch: t("assistsPerMatch"),
+              cards: t("cardsTotal"),
+              careerSoon: t("careerSoon"),
             }}
           />
         </div>
@@ -226,6 +282,17 @@ export default async function PlayerPage({
           <AdSlot placement="sidebar-rectangle" />
         </aside>
       </div>
+    </div>
+  );
+}
+
+function MetaChip({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-border bg-muted/30 px-2.5 py-1">
+      <dt className="sr-only">{label}</dt>
+      <dd className="text-muted-foreground">
+        <span className="text-foreground">{value}</span>
+      </dd>
     </div>
   );
 }
@@ -299,7 +366,7 @@ function RatingSummaryChart({
                   "w-full rounded-t-sm",
                   r.rating >= 7
                     ? "bg-success"
-                    : r.rating >= 6.5
+                    : r.rating >= 6
                       ? "bg-amber-500"
                       : "bg-destructive/70"
                 )}

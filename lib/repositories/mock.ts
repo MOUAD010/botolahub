@@ -57,6 +57,16 @@ export class MockMatchRepository implements MatchRepository {
   async getLineups(matchId: string): Promise<Lineup[]> {
     return getLineupsByMatchId(matchId);
   }
+
+  async getGoalEvents(_matchId: string): Promise<import("@/lib/types").MatchGoalEvent[]> {
+    return [];
+  }
+
+  async getTimelineEvents(
+    _matchId: string
+  ): Promise<import("@/lib/types").MatchTimelineEvent[]> {
+    return [];
+  }
 }
 
 export class MockTeamRepository implements TeamRepository {
@@ -164,6 +174,16 @@ export class MockPlayerRepository implements PlayerRepository {
 
   async getSeasonStats(playerId: string): Promise<PlayerSeasonStats | null> {
     return getSeasonStatsByPlayerId(playerId) ?? null;
+  }
+
+  async getSeasonStatsForPlayers(
+    playerIds: string[]
+  ): Promise<Record<string, PlayerSeasonStats | null>> {
+    const out: Record<string, PlayerSeasonStats | null> = {};
+    for (const id of playerIds) {
+      out[id] = getSeasonStatsByPlayerId(id) ?? null;
+    }
+    return out;
   }
 
   async getRecentRatings(

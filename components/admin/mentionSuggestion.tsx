@@ -5,9 +5,8 @@ import tippy, { type Instance as TippyInstance } from "tippy.js";
 import type { SuggestionOptions, SuggestionProps } from "@tiptap/suggestion";
 import {
   isHintMention,
-  searchMentions,
   type MentionItem,
-} from "@/lib/mentions";
+} from "@/lib/mentions-shared";
 import {
   MentionList,
   type MentionListRef,
@@ -19,7 +18,11 @@ export const mentionSuggestion: Omit<
 > = {
   char: "@",
   allowSpaces: true,
-  items: ({ query }) => searchMentions(query),
+  items: ({ query }) =>
+    fetch(`/api/admin/mentions?q=${encodeURIComponent(query)}`)
+      .then((res) => (res.ok ? res.json() : { items: [] }))
+      .then((data: { items: MentionItem[] }) => data.items)
+      .catch(() => [] as MentionItem[]),
   command: ({ editor, range, props }) => {
     if (isHintMention(props)) return;
 

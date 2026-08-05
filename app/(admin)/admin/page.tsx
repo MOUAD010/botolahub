@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   Eye,
   FileText,
   MousePointerClick,
   Newspaper,
+  RefreshCw,
   TrendingUp,
   Users,
 } from "lucide-react";
@@ -27,8 +29,19 @@ type AnalyticsPayload = {
   topPaths: Array<{ path: string; count: number }>;
 };
 
+type SyncStatus = {
+  quota: { requests?: { current?: number; limit_day?: number } } | null;
+  runs: Array<{
+    kind: string;
+    status: string;
+    startedAt: string;
+    message: string | null;
+  }>;
+};
+
 export default function AdminOverviewPage() {
   const [data, setData] = useState<AnalyticsPayload | null>(null);
+  const [sync, setSync] = useState<SyncStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,6 +52,13 @@ export default function AdminOverviewPage() {
       })
       .then(setData)
       .catch((e) => setError(e instanceof Error ? e.message : "Error"));
+
+    void fetch("/api/admin/sync/football")
+      .then(async (res) => (res.ok ? res.json() : null))
+      .then((payload) => {
+        if (payload) setSync(payload as SyncStatus);
+      })
+      .catch(() => {});
   }, []);
 
   if (error) {
@@ -68,6 +88,10 @@ export default function AdminOverviewPage() {
     { label: "Drafts", value: data.news.drafts, icon: FileText },
   ];
 
+  const used = sync?.quota?.requests?.current;
+  const limit = sync?.quota?.requests?.limit_day ?? 100;
+  const lastRun = sync?.runs?.[0];
+
   return (
     <div className="space-y-8">
       <header>
@@ -76,6 +100,28 @@ export default function AdminOverviewPage() {
           Daily visits and news performance.
         </p>
       </header>
+
+      <Link
+        href="/admin/sync"
+        className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-4 shadow-sm transition-colors hover:border-primary/40"
+      >
+        <div className="flex items-center gap-3">
+          <span className="rounded-md bg-primary/10 p-2 text-primary">
+            <RefreshCw className="size-4" aria-hidden />
+          </span>
+          <div>
+            <p className="text-sm font-semibold">Football API sync</p>
+            <p className="text-xs text-muted-foreground">
+              {lastRun
+                ? `Last: ${lastRun.kind} · ${lastRun.status} · ${new Date(lastRun.startedAt).toLocaleString()}`
+                : "No sync runs yet"}
+            </p>
+          </div>
+        </div>
+        <p className="text-sm tabular-nums text-muted-foreground">
+          {typeof used === "number" ? `${used}/${limit} req` : "Quota —"}
+        </p>
+      </Link>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {metrics.map((m) => {

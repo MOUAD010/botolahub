@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/lib/i18n/routing";
 import {
+  getPrimaryCompetitionForTeam,
   standingsRepository,
   teamRepository,
 } from "@/lib/repositories";
-import { teams } from "@/data/teams.mock";
-import { BOTOLA_PRO } from "@/data/matches.mock";
 import type { PlayerPosition } from "@/lib/types";
 import { FormBadges } from "@/components/standings/FormBadges";
 import { AdSlot } from "@/components/ads/AdSlot";
@@ -20,10 +20,12 @@ import { buildSportsTeamJsonLd, JsonLd } from "@/lib/seo/jsonld";
 export const revalidate = 300;
 
 export function generateStaticParams() {
-  return routing.locales.flatMap((locale) =>
-    teams.map((team) => ({ locale, slug: team.slug }))
-  );
+  return [];
 }
+
+// Shared per-request so generateMetadata and the page body don't each fetch
+// the same team separately.
+const getTeam = cache((slug: string) => teamRepository.getBySlug(slug));
 
 export async function generateMetadata({
   params,
@@ -31,19 +33,27 @@ export async function generateMetadata({
   params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
   const { locale, slug } = await params;
-  const team = await teamRepository.getBySlug(slug);
+  const team = await getTeam(slug);
   if (!team) return {};
+
+  const description = `${team.name} — squad, form, standings, stats and trophies.`;
 
   return {
     title: team.name,
-    description: `${team.name} — squad, form, standings, stats and trophies.`,
+    description,
     alternates: {
       canonical: buildCanonical(locale, `/team/${slug}`),
       languages: buildLanguageAlternates(`/team/${slug}`),
     },
     openGraph: {
       title: team.name,
+      description,
       url: buildCanonical(locale, `/team/${slug}`),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: team.name,
+      description,
     },
   };
 }
@@ -58,8 +68,10 @@ export default async function TeamPage({
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  const team = await teamRepository.getBySlug(slug);
+  const team = await getTeam(slug);
   if (!team) notFound();
+
+  const competitionId = await getPrimaryCompetitionForTeam(team.id);
 
   const [
     squad,
@@ -76,8 +88,8 @@ export default async function TeamPage({
     tCommon,
   ] = await Promise.all([
     teamRepository.getSquad(team.id),
-    standingsRepository.getTeamStanding(BOTOLA_PRO.id, team.slug),
-    standingsRepository.getStandings(BOTOLA_PRO.id),
+    standingsRepository.getTeamStanding(competitionId, team.slug),
+    standingsRepository.getStandings(competitionId),
     teamRepository.getUpcomingFixtures(team.slug),
     teamRepository.getRecentMatches(team.slug, 8),
     teamRepository.getTrophies(team.id),

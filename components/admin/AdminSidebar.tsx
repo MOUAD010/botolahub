@@ -6,7 +6,9 @@ import {
   ArrowLeft,
   LayoutDashboard,
   LogOut,
+  Megaphone,
   Newspaper,
+  RefreshCw,
   Search,
 } from "lucide-react";
 import { BrandLogo } from "@/components/layout/BrandLogo";
@@ -16,6 +18,8 @@ import { cn } from "@/lib/utils";
 const nav = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/admin/news", label: "News", icon: Newspaper },
+  { href: "/admin/ads", label: "Ads", icon: Megaphone },
+  { href: "/admin/sync", label: "Football sync", icon: RefreshCw },
   { href: "/admin/ranking", label: "Ranking", icon: Search },
 ];
 

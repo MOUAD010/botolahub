@@ -3,18 +3,21 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { Link } from "@/lib/i18n/navigation";
-import type { Standing } from "@/lib/types";
+import type { PlayerSeasonStats, Standing } from "@/lib/types";
 import type { TopScorerEntry } from "@/lib/repositories/types";
 import { FormBadges } from "@/components/standings/FormBadges";
 import { PlayerAvatar } from "@/components/player/PlayerAvatar";
-import { TeamOfTheWeek } from "@/components/home/TeamOfTheWeek";
-import type { Lineup, PlayerSeasonStats } from "@/lib/types";
+import {
+  TeamOfTheWeek,
+  type TotwPayload,
+} from "@/components/home/TeamOfTheWeek";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { ratingTone } from "@/lib/rating";
 import { cn } from "@/lib/utils";
 
 type VenueFilter = "all" | "home" | "away";
@@ -27,13 +30,6 @@ type StatCategory =
 
 function formatDiff(diff: number): string {
   return diff > 0 ? `+${diff}` : `${diff}`;
-}
-
-function ratingTone(rating: number) {
-  if (rating >= 7.5) return "bg-success text-success-foreground";
-  if (rating >= 7) return "bg-emerald-600 text-white";
-  if (rating >= 6.5) return "bg-amber-500 text-black";
-  return "bg-muted text-muted-foreground";
 }
 
 /** Approximate home/away split from full standings for UI filters. */
@@ -69,15 +65,11 @@ export function CompetitionMainTabs({
   standings,
   topScorers,
   totw,
-  totwWeekLabel,
-  totwStatsById,
   labels,
 }: {
   standings: Standing[];
   topScorers: TopScorerEntry[];
-  totw: Lineup;
-  totwWeekLabel: string;
-  totwStatsById: Record<string, PlayerSeasonStats | null>;
+  totw: TotwPayload | null;
   labels: {
     standings: string;
     stats: string;
@@ -361,11 +353,9 @@ export function CompetitionMainTabs({
             </div>
           </dl>
         </div>
-        <TeamOfTheWeek
-          lineup={totw}
-          weekLabel={totwWeekLabel}
-          statsById={totwStatsById}
-        />
+        {totw ? (
+          <TeamOfTheWeek pro={totw} botola2={null} />
+        ) : null}
       </TabsContent>
 
       <TabsContent value="media">

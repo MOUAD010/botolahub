@@ -1,7 +1,9 @@
 import type {
   Lineup,
   Match,
+  MatchGoalEvent,
   MatchStats,
+  MatchTimelineEvent,
   Player,
   PlayerMatchRating,
   PlayerSeasonStats,
@@ -15,6 +17,8 @@ export interface MatchRepository {
   getBySlug(slug: string): Promise<Match | null>;
   getStats(matchId: string): Promise<MatchStats | null>;
   getLineups(matchId: string): Promise<Lineup[]>;
+  getGoalEvents(matchId: string): Promise<MatchGoalEvent[]>;
+  getTimelineEvents(matchId: string): Promise<MatchTimelineEvent[]>;
 }
 
 export interface TeamRepository {
@@ -44,6 +48,9 @@ export interface TopScorerEntry {
 export interface PlayerRepository {
   getBySlug(slug: string): Promise<Player | null>;
   getSeasonStats(playerId: string): Promise<PlayerSeasonStats | null>;
+  getSeasonStatsForPlayers(
+    playerIds: string[]
+  ): Promise<Record<string, PlayerSeasonStats | null>>;
   getRecentRatings(
     playerId: string,
     limit?: number

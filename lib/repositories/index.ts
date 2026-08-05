@@ -1,9 +1,9 @@
 import {
-  MockMatchRepository,
-  MockPlayerRepository,
-  MockStandingsRepository,
-  MockTeamRepository,
-} from "./mock";
+  PostgresMatchRepository,
+  PostgresPlayerRepository,
+  PostgresStandingsRepository,
+  PostgresTeamRepository,
+} from "./postgres";
 import type {
   MatchRepository,
   PlayerRepository,
@@ -11,14 +11,23 @@ import type {
   TeamRepository,
 } from "./types";
 
-// Swap point: replace these with API-backed implementations later.
-// Every page imports the repositories from here, never from ./mock
-// directly, so that swap is a one-file change.
-export const matchRepository: MatchRepository = new MockMatchRepository();
-export const teamRepository: TeamRepository = new MockTeamRepository();
+export const matchRepository: MatchRepository = new PostgresMatchRepository();
+export const teamRepository: TeamRepository = new PostgresTeamRepository();
 export const standingsRepository: StandingsRepository =
-  new MockStandingsRepository();
-export const playerRepository: PlayerRepository = new MockPlayerRepository();
+  new PostgresStandingsRepository();
+export const playerRepository: PlayerRepository = new PostgresPlayerRepository();
+
+export {
+  getCompetition,
+  getFixturesAroundNow,
+  getHomeFixtures,
+  getMatchById,
+  getPlayerById,
+  getPrimaryCompetitionForTeam,
+  getTeamOfTheWeekFromDb,
+  listFixturesForMentions,
+  listPlayersForMentions,
+} from "./postgres";
 
 export type {
   MatchRepository,

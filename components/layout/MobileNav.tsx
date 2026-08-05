@@ -16,9 +16,10 @@ import { BrandLogo } from "./BrandLogo";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 
 const navItems = [
-  { href: "/" as const, key: "home" },
-  { href: "/botola-pro" as const, key: "botolaPro" },
-  { href: "/news" as const, key: "news" },
+  { href: "/" as const, labelKey: "home" as const },
+  { href: "/botola-pro" as const, labelKey: "botolaPro" as const },
+  { href: "/botola-2" as const, labelKey: "botola2" as const },
+  { href: "/news" as const, labelKey: "news" as const },
 ];
 
 export function MobileNav() {
@@ -48,12 +49,12 @@ export function MobileNav() {
         <nav aria-label={t("menu")} className="flex flex-col gap-1 px-4">
           {navItems.map((item) => (
             <Link
-              key={item.key}
+              key={item.labelKey}
               href={item.href}
               onClick={() => setOpen(false)}
               className="flex min-h-11 items-center rounded-md px-2 text-base font-medium hover:bg-muted"
             >
-              {t(item.key)}
+              {t(item.labelKey)}
             </Link>
           ))}
         </nav>

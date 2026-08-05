@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
-import { searchCatalog, type SearchResult } from "@/lib/search";
+import type { SearchResult } from "@/lib/search";
 import { PlayerAvatar } from "@/components/player/PlayerAvatar";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +17,26 @@ export function SiteSearch({ className }: { className?: string }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const deferred = useDeferredValue(query);
-  const results = searchCatalog(deferred, 10);
+  const [results, setResults] = useState<SearchResult[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!deferred.trim()) {
+      setResults([]);
+      return;
+    }
+    void fetch(`/api/search?q=${encodeURIComponent(deferred)}&limit=10`)
+      .then((res) => (res.ok ? res.json() : { results: [] }))
+      .then((data: { results: SearchResult[] }) => {
+        if (!cancelled) setResults(data.results);
+      })
+      .catch(() => {
+        if (!cancelled) setResults([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [deferred]);
 
   useEffect(() => {
     function onDocClick(e: MouseEvent) {

@@ -4,13 +4,12 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/lib/i18n/routing";
 import { Link } from "@/lib/i18n/navigation";
 import {
-  matchRepository,
-  playerRepository,
+  getHomeFixtures,
+  getTeamOfTheWeekFromDb,
   standingsRepository,
 } from "@/lib/repositories";
-import { BOTOLA_PRO } from "@/data/matches.mock";
-import { teamOfTheWeek, totwWeekLabel } from "@/data/totw.mock";
-import type { Match, Standing, PlayerSeasonStats } from "@/lib/types";
+import { BOTOLA_2, BOTOLA_PRO } from "@/lib/api-football/constants";
+import type { Match, Standing } from "@/lib/types";
 import { MatchCard } from "@/components/match/MatchCard";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { FormBadges } from "@/components/standings/FormBadges";
@@ -36,14 +35,18 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "home" });
+  const title = t("title");
+  const description = t("description");
 
   return {
-    title: t("title"),
-    description: t("description"),
+    title,
+    description,
     alternates: {
       canonical: buildCanonical(locale, "/"),
       languages: buildLanguageAlternates("/"),
     },
+    openGraph: { title, description },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
@@ -55,22 +58,16 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [matches, standings, t, tCommon, tStandings] = await Promise.all([
-    matchRepository.getByCompetition(BOTOLA_PRO.id),
-    standingsRepository.getStandings(BOTOLA_PRO.id),
-    getTranslations({ locale, namespace: "home" }),
-    getTranslations({ locale, namespace: "common" }),
-    getTranslations({ locale, namespace: "standings" }),
-  ]);
-
-  const totwStatsEntries = await Promise.all(
-    teamOfTheWeek.startingXI.map(
-      async (p) =>
-        [p.id, await playerRepository.getSeasonStats(p.id)] as const
-    )
-  );
-  const totwStatsById: Record<string, PlayerSeasonStats | null> =
-    Object.fromEntries(totwStatsEntries);
+  const [matches, standings, totwPro, totwB2, t, tCommon, tStandings] =
+    await Promise.all([
+      getHomeFixtures(7),
+      standingsRepository.getStandings(BOTOLA_PRO.id),
+      getTeamOfTheWeekFromDb(BOTOLA_PRO.id),
+      getTeamOfTheWeekFromDb(BOTOLA_2.id),
+      getTranslations({ locale, namespace: "home" }),
+      getTranslations({ locale, namespace: "common" }),
+      getTranslations({ locale, namespace: "standings" }),
+    ]);
 
   const live = matches.filter((m) => m.status === "live");
   const finished = matches.filter((m) => m.status === "finished");
@@ -100,12 +97,8 @@ export default async function HomePage({
 
         {/* Center: Team of the Week */}
         <section className="min-w-0 order-3 xl:order-2">
-          <TeamOfTheWeek
-            lineup={teamOfTheWeek}
-            weekLabel={totwWeekLabel}
-            statsById={totwStatsById}
-          />
-          <div className="mt-5">
+          <TeamOfTheWeek pro={totwPro} botola2={totwB2} />
+          <div className={totwPro || totwB2 ? "mt-5" : undefined}>
             <StandingsSnippet
               standings={standings}
               heading={t("standingsHeading")}

@@ -2,6 +2,7 @@
   "nav": {
     "home": "Home",
     "botolaPro": "Botola Pro",
+    "botola2": "Botola 2",
     "standings": "Standings",
     "fixtures": "Fixtures",
     "topScorers": "Top Scorers",
@@ -33,7 +34,8 @@
     "standingsHeading": "Standings",
     "viewFullStandings": "Full standings",
     "noMatches": "No matches in this category.",
-    "teamOfTheWeek": "Team of the Week"
+    "teamOfTheWeek": "Team of the Week",
+    "totwLeagueSwitcher": "Team of the Week league"
   },
   "match": {
     "overview": "Overview",
@@ -55,8 +57,23 @@
     "noPreviousMeetings": "No previous meetings available.",
     "leaguePosition": "League Position",
     "noLineups": "Lineups not available yet.",
-    "noStats": "Stats not available yet.",
-    "noMedia": "Highlights coming soon."
+    "noStats": "Detailed match statistics are not available for this fixture.",
+    "noMedia": "Highlights coming soon.",
+    "matchInfo": "Match info",
+    "kickoff": "Kick-off",
+    "timeline": "Match timeline",
+    "noEvents": "No events available yet.",
+    "teamComparison": "Team comparison",
+    "formations": "Formations",
+    "coach": "Coach",
+    "recentForm": "Recent results",
+    "previousMeetings": "Previous meetings",
+    "eventGoal": "Goal",
+    "eventPenalty": "Penalty",
+    "eventOwnGoal": "Own goal",
+    "eventYellow": "Yellow card",
+    "eventRed": "Red card",
+    "eventSubst": "Substitution"
   },
   "standings": {
     "position": "#",
@@ -116,7 +133,18 @@
       "DF": "Defender",
       "MF": "Midfielder",
       "FW": "Forward"
-    }
+    },
+    "seasonLabel": "2024/25",
+    "seasonOverview": "Season overview",
+    "attacking": "Attacking",
+    "discipline": "Discipline",
+    "perMatch": "Per match",
+    "contributions": "G+A",
+    "goalsPerMatch": "Goals / match",
+    "assistsPerMatch": "Assists / match",
+    "cardsTotal": "Cards",
+    "noData": "No data available yet.",
+    "careerSoon": "Full career history needs past-season data. Season stats are in the Season tab."
   },
   "news": {
     "title": "News — KooraLive",
@@ -132,9 +160,9 @@
     "metaDescription": "Botola Pro live standings, matchday fixtures, player stats and season details.",
     "name": "Botola Pro",
     "country": "Morocco",
-    "season": "2025/26",
-    "seasonStart": "Aug 2025",
-    "seasonEnd": "May 2026",
+    "season": "2024/25",
+    "seasonStart": "Aug 2024",
+    "seasonEnd": "May 2025",
     "favourite": "Favourite",
     "followers": "Morocco’s top division",
     "matches": "Matches",
@@ -160,8 +188,42 @@
     "seasonLabel": "Season",
     "teamsLabel": "Teams"
   },
+  "competition2": {
+    "metaTitle": "Botola 2 — Standings, fixtures & results",
+    "metaDescription": "Botola 2 live standings, matchday fixtures and season details.",
+    "name": "Botola 2",
+    "country": "Morocco",
+    "season": "2024/25",
+    "seasonStart": "Aug 2024",
+    "seasonEnd": "May 2025",
+    "favourite": "Favourite",
+    "followers": "Morocco’s second division",
+    "matches": "Matches",
+    "byRound": "By round",
+    "byDate": "By date",
+    "featured": "Featured",
+    "tabStandings": "Standings",
+    "tabStats": "Stats",
+    "tabDetails": "Details",
+    "tabMedia": "Media",
+    "filterAll": "All",
+    "filterHome": "Home",
+    "filterAway": "Away",
+    "playerStats": "Player stats",
+    "statGeneral": "General",
+    "statAttack": "Attack",
+    "statDefense": "Defense",
+    "statPassing": "Passing",
+    "statGoalkeeping": "Goalkeeping",
+    "noMedia": "Media coming soon.",
+    "detailsBody": "Botola 2 is Morocco’s second football division, with promotion and relegation linked to Botola Pro.",
+    "countryLabel": "Country",
+    "seasonLabel": "Season",
+    "teamsLabel": "Teams"
+  },
   "ads": {
-    "advertisement": "Advertisement"
+    "advertisement": "Advertisement",
+    "loading": "Loading ad…"
   },
   "footer": {
     "rights": "All rights reserved.",
