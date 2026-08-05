@@ -1145,7 +1145,15 @@ export async function getTeamOfTheWeekFromDb(
   };
 }
 
-/** Real headshots are larger than the ~5192B API silhouette stub. */
+/**
+ * Real headshots are larger than the ~5192B API silhouette stub, so the
+ * downloaded file size tells us whether a photo is worth showing.
+ *
+ * The file is only present on machines that ran a sync. When it is missing we
+ * cannot measure anything, so assume the photo is real and let the CDN
+ * fallback serve it — showing an occasional upstream silhouette is far better
+ * than replacing every photo with a placeholder.
+ */
 async function hasRealPlayerPhoto(
   photoPath: string | null | undefined
 ): Promise<boolean> {
@@ -1157,7 +1165,7 @@ async function hasRealPlayerPhoto(
     const s = await stat(file);
     return s.size > 5500;
   } catch {
-    return false;
+    return true;
   }
 }
 
