@@ -330,8 +330,8 @@ export const adPlacementEnum = pgEnum("ad_placement", [
 ]);
 
 /**
- * @deprecated Manual creatives removed — network-only ads.
- * Table kept so existing DBs don’t break; unused by the app.
+ * Manual / house ads uploaded from the backoffice. When enabled for a
+ * placement they take priority over the network unit for that slot.
  */
 export const adCreatives = pgTable("ad_creatives", {
   id: uuid("id").defaultRandom().primaryKey(),

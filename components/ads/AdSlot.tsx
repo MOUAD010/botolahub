@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { cn } from "@/lib/utils";
 import { resolveAdForPlacement, type AdPlacement } from "@/lib/repositories/ads";
 import { AdSenseUnit } from "@/components/ads/AdSenseUnit";
+import { ManualAdRotator } from "@/components/ads/ManualAdRotator";
 
 export type { AdPlacement } from "@/lib/ads-types";
 
@@ -57,6 +58,25 @@ export async function AdSlot({
     config.className,
     className
   );
+
+  if (resolved.mode === "manual") {
+    return (
+      <aside
+        role="complementary"
+        aria-label={t("advertisement")}
+        data-ad-placement={placement}
+        data-ad-network="manual"
+        className={cn(shellClass, "border border-border bg-card")}
+        style={{ minHeight: config.minHeight }}
+      >
+        <ManualAdRotator
+          creatives={resolved.creatives}
+          width={config.width}
+          height={config.height}
+        />
+      </aside>
+    );
+  }
 
   if (resolved.mode === "network" && resolved.provider === "adsense") {
     return (

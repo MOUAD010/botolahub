@@ -47,12 +47,15 @@ export async function POST(request: Request) {
           ? "webp"
           : "gif";
 
-  const dir = path.join(process.cwd(), "public", "uploads", "news");
+  const folderRaw = String(form.get("folder") || "news");
+  const folder = folderRaw === "ads" ? "ads" : "news";
+
+  const dir = path.join(process.cwd(), "public", "uploads", folder);
   await mkdir(dir, { recursive: true });
 
   const filename = `${randomUUID()}.${ext}`;
   const buffer = Buffer.from(await file.arrayBuffer());
   await writeFile(path.join(dir, filename), buffer);
 
-  return NextResponse.json({ url: `/uploads/news/${filename}` });
+  return NextResponse.json({ url: `/uploads/${folder}/${filename}` });
 }
